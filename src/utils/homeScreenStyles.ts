@@ -63,18 +63,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarContainer: {
-    width: 70,
+    width: 70, // Keep original size to avoid scaling the card
     height: 70,
-    borderRadius: 35,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 0, // Remove margin, we'll add padding in 'details'
   },
+  ageContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 60,
+  },
+  
+  ageText: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#333',
+  },
+  
+  daysSubtext: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#555',
+    marginTop: 2,
+  },
+  
   avatar: {
-    fontSize: 46,
+    fontSize: 45, // Increased from 46 to make it bigger
   },
+  
   details: {
     flex: 1,
+    paddingLeft: 15, // Adds spacing between avatar and text
   },
   name: {
     fontSize: 20,

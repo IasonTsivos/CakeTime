@@ -48,6 +48,27 @@ type ListItem = { type: 'header'; title: string } | { type: 'item'; birthday: Bi
 
 const CARD_WIDTH = width - 40;
 
+const getNextAge = (dateString: string) => {
+    const birthDate = parseISO(dateString);
+    const today = new Date();
+  
+    const birthMonth = birthDate.getMonth();
+    const birthDay = birthDate.getDate();
+  
+    let age = today.getFullYear() - birthDate.getFullYear();
+  
+    // If birthday hasn't occurred yet this year, subtract 1
+    if (
+      today.getMonth() < birthMonth ||
+      (today.getMonth() === birthMonth && today.getDate() < birthDay)
+    ) {
+      age--;
+    }
+  
+    return age + 1; // because we want the upcoming age
+  };
+  
+  
 const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
   if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
   if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
@@ -174,9 +195,12 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
               </Text>
               <Text style={styles.date}>{format(parseISO(birthday.date), 'MMMM do')}</Text>
             </View>
-            <View style={styles.daysContainer}>
-              <Text style={styles.daysText}>{daysText}</Text>
-            </View>
+            <View style={styles.ageContainer}>
+                <Text style={styles.ageText}>{getNextAge(birthday.date)}</Text>
+                <Text style={styles.daysSubtext}>
+                    {getDaysUntilBirthday(birthday.date).replace('!', '')}
+                </Text>
+                </View>
           </View>
         </LinearGradient>
       </TouchableOpacity>

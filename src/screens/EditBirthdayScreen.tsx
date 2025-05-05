@@ -66,16 +66,11 @@ export default function EditBirthdayScreen() {
   
     try {
       await updateBirthday(updatedBirthday); // Update the birthday
-      Alert.alert('Saved', 'Birthday updated successfully', [
-        {
-          text: 'OK',
-          onPress: () => navigation.navigate('Home', { refresh: true }), // Refresh the Home screen
-        },
-      ]);
+      navigation.navigate('Home', { refresh: true }); // Navigate back without showing an alert
     } catch (e) {
-      Alert.alert('Error', 'Failed to update birthday');
+      Alert.alert('Error', 'Failed to update birthday'); // Still show an alert on error
     }
-  };
+  }    
   
   const handleDelete = () => {
     Alert.alert('Delete Birthday', 'Are you sure?', [
