@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarContainer: {
-    backgroundColor: 'rgba(255,255,255,0.3)',
     width: 70,
     height: 70,
     borderRadius: 35,
@@ -108,6 +107,7 @@ const styles = StyleSheet.create({
       top: 0,
       left: 0,
       zIndex: -1,
+      opacity: 0.4,
     },
   confetti: {
     position: 'absolute',

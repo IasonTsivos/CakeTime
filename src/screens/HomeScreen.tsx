@@ -7,37 +7,52 @@ import {
   TouchableOpacity,
   Dimensions,
   Animated,
-  Platform,
-  ImageBackground,
+  ColorValue,
 } from 'react-native';
+import { ScrollView } from 'react-native';
 import { getBirthdays } from '../utils/storage';
 import { Birthday } from '../types/Birthday';
-import { parseISO, format, isBefore, addYears, differenceInDays, startOfDay } from 'date-fns';
+import {
+  parseISO,
+  format,
+  isBefore,
+  addYears,
+  differenceInDays,
+  startOfDay,
+  isThisWeek,
+  isThisMonth,
+} from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { ColorValue } from 'react-native';
-import { useFocusEffect,useRoute } from '@react-navigation/native'; 
+import { useFocusEffect } from '@react-navigation/native';
 import homescreenstyles from '../utils/homeScreenStyles';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import AddBirthday from '../screens/AddBirthdayScreen';
 
-const { width,height } = Dimensions.get('window');
-const CARD_WIDTH = width - 40;
+const { width } = Dimensions.get('window');
 
 type RootStackParamList = {
-    Home: undefined;
-    BirthdayDetails: { birthday: Birthday };
-    AddBirthday: undefined;
-    EditBirthday: { birthday: Birthday }; // ✅ Add this line
-  };
-  
+  Home: undefined;
+  AddBirthday: undefined;
+  EditBirthday: { birthday: Birthday };
+};
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 interface HomeScreenProps {
   navigation: HomeScreenNavigationProp;
 }
+
+type ListItem = { type: 'header'; title: string } | { type: 'item'; birthday: Birthday };
+
+const CARD_WIDTH = width - 40;
+
+const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
+  if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
+  if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
+  return ['#D4FC79', '#96E6A1'];
+};
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
@@ -48,20 +63,19 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     React.useCallback(() => {
       const loadBirthdays = async () => {
         try {
-            const saved: Birthday[] = await getBirthdays();
-            const today = startOfDay(new Date());
-            const sorted = saved.sort((a, b) => {
-              const aDate = startOfDay(parseISO(a.date));
-              const bDate = startOfDay(parseISO(b.date));
-            
-              let aNext = startOfDay(new Date(aDate.setFullYear(today.getFullYear())));
-              let bNext = startOfDay(new Date(bDate.setFullYear(today.getFullYear())));
-            
-              if (isBefore(aNext, today)) aNext = startOfDay(addYears(aNext, 1));
-              if (isBefore(bNext, today)) bNext = startOfDay(addYears(bNext, 1));
-            
-              return aNext.getTime() - bNext.getTime();
-            });
+          const saved: Birthday[] = await getBirthdays();
+          const today = startOfDay(new Date());
+          const sorted = saved.sort((a, b) => {
+            const aDate = startOfDay(parseISO(a.date));
+            const bDate = startOfDay(parseISO(b.date));
+            let aNext = startOfDay(new Date(aDate.setFullYear(today.getFullYear())));
+            let bNext = startOfDay(new Date(bDate.setFullYear(today.getFullYear())));
+
+            if (isBefore(aNext, today)) aNext = addYears(aNext, 1);
+            if (isBefore(bNext, today)) bNext = addYears(bNext, 1);
+
+            return aNext.getTime() - bNext.getTime();
+          });
           setBirthdays(sorted);
         } catch (error) {
           console.error('Error loading birthdays:', error);
@@ -77,69 +91,95 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const getDaysUntilBirthday = (dateString: string) => {
     const today = startOfDay(new Date());
     const birthDate = parseISO(dateString);
-    let nextBirthday = startOfDay(new Date(birthDate.setFullYear(today.getFullYear())));
+    let nextBirthday = new Date(birthDate.setFullYear(today.getFullYear()));
+    nextBirthday = startOfDay(nextBirthday);
     if (isBefore(nextBirthday, today)) {
-      nextBirthday = startOfDay(addYears(nextBirthday, 1));
+      nextBirthday = addYears(nextBirthday, 1);
     }
     const days = differenceInDays(nextBirthday, today);
-    return days === 0 ? "Today!" : days === 1 ? "Tomorrow!" : `${days} days`;
+    return days === 0 ? 'Today!' : days === 1 ? 'Tomorrow!' : `${days} days`;
   };
 
-  const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
-    if (daysText === "Today!") return ['#FF9A9E', '#FAD0C4'];
-    if (daysText === "Tomorrow!") return ['#A1C4FD', '#C2E9FB'];
-    return ['#D4FC79', '#96E6A1'];
-  };
+  const groupBirthdays = (birthdays: Birthday[]) => {
+    const today = startOfDay(new Date());
+    const upcoming: Birthday[] = [];
+    const thisWeek: Birthday[] = [];
+    const thisMonth: Birthday[] = [];
+    const next6Months: Birthday[] = [];
+    const rest: Birthday[] = [];
 
-  const renderItem = ({ item, index }: { item: Birthday; index: number }) => {
-    const daysText = getDaysUntilBirthday(item.date);
-    const colors = getBackgroundColor(daysText);
-    const isToday = daysText === "Today!";
+    birthdays.forEach((birthday) => {
+      const bDate = parseISO(birthday.date);
+      let nextBday = new Date(bDate.setFullYear(today.getFullYear()));
+      nextBday = startOfDay(nextBday);
+      if (isBefore(nextBday, today)) nextBday = addYears(nextBday, 1);
 
-    const scale = scrollY.interpolate({
-      inputRange: [-1, 0, index * (CARD_WIDTH * 0.6), (index + 2) * (CARD_WIDTH * 0.6)],
-      outputRange: [1, 1, 1, 0.9],
+      const daysUntil = differenceInDays(nextBday, today);
+      if (daysUntil < 0) return;
+
+      if (daysUntil === 0) upcoming.push(birthday);
+      else if (isThisWeek(nextBday)) thisWeek.push(birthday);
+      else if (isThisMonth(nextBday)) thisMonth.push(birthday);
+      else if (daysUntil <= 180) next6Months.push(birthday);
+      else rest.push(birthday);
     });
 
+    return { upcoming, thisWeek, thisMonth, next6Months, rest };
+  };
+
+  const { upcoming, thisWeek, thisMonth, next6Months, rest } = groupBirthdays(birthdays);
+
+  const buildFlatListData = (): ListItem[] => {
+    const sections: [string, Birthday[]][] = [
+      ['Upcoming', upcoming],
+      ['This Week', thisWeek],
+      ['This Month', thisMonth],
+      ['Next 6 Months', next6Months],
+      ['Rest', rest],
+    ];
+
+    const flatListData: ListItem[] = [];
+
+    sections.forEach(([title, items]) => {
+      if (items.length > 0) {
+        flatListData.push({ type: 'header', title });
+        items.forEach((birthday) => flatListData.push({ type: 'item', birthday }));
+      }
+    });
+
+    return flatListData;
+  };
+
+  const renderBirthdayCard = (birthday: Birthday) => {
+    const daysText = getDaysUntilBirthday(birthday.date);
+    const colors = getBackgroundColor(daysText);
+
     return (
-      <Animated.View style={{ transform: [{ scale }] }}>
-        <TouchableOpacity
-          style={styles.birthdayCard}
-          activeOpacity={0.9}
-          onPress={() => navigation.navigate('EditBirthday', { birthday: item })}
+      <TouchableOpacity
+        style={styles.birthdayCard}
+        activeOpacity={0.9}
+        onPress={() => navigation.navigate('EditBirthday', { birthday })}
+      >
+        <LinearGradient
+          colors={colors}
+          style={styles.gradientBackground}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         >
-          <LinearGradient
-            colors={colors}
-            style={StyleSheet.flatten([
-              styles.gradientBackground,
-              !isToday && { paddingVertical: 12, paddingHorizontal: 16 },
-            ])}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.cardContent}>
-              <View style={StyleSheet.flatten([styles.avatarContainer, !isToday && { width: 50, height: 50, borderRadius: 25 }])}>
-                <Text style={[styles.avatar, !isToday && { fontSize: 24 }]}>{item.avatar}</Text>
-              </View>
-              <View style={styles.details}>
-                <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-                <Text style={styles.date}>{format(parseISO(item.date), 'MMMM do')}</Text>
-              </View>
-              <View style={styles.daysContainer}>
-                <Text style={styles.daysText}>{daysText}</Text>
-                {isToday && (
-                  <LottieView
-                    source={require('../assets/animations/confetti.json')}
-                    autoPlay
-                    loop
-                    style={[styles.confetti, { width: 250, height: 250, top: -50, left: -50 }]}
-                  />
-                )}
-              </View>
+          <View style={styles.cardContent}>
+            <Text style={styles.avatar}>{birthday.avatar}</Text>
+            <View style={styles.details}>
+              <Text style={styles.name} numberOfLines={1}>
+                {birthday.name}
+              </Text>
+              <Text style={styles.date}>{format(parseISO(birthday.date), 'MMMM do')}</Text>
             </View>
-          </LinearGradient>
-        </TouchableOpacity>
-      </Animated.View>
+            <View style={styles.daysContainer}>
+              <Text style={styles.daysText}>{daysText}</Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
     );
   };
 
@@ -150,10 +190,6 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         autoPlay
         loop
         style={styles.backgroundAnimation}
-      />
-      <LinearGradient
-        colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.7)']}
-        style={StyleSheet.absoluteFill}
       />
       <View style={styles.header}>
         <Text style={styles.heading}>Birthday Reminders</Text>
@@ -167,31 +203,37 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
       {birthdays.length === 0 ? (
         <View style={styles.emptyState}>
-          <LottieView autoPlay loop style={styles.emptyAnimation} />
           <Text style={styles.emptyText}>No birthdays yet!</Text>
-          <Text style={styles.emptySubtext}>Tap the + button to add one</Text>
         </View>
       ) : (
-        <Animated.FlatList
-          data={birthdays}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
+        <FlatList
+          data={buildFlatListData()}
+          keyExtractor={(item, index) =>
+            item.type === 'header' ? `header-${item.title}` : item.birthday.id
+          }
+          renderItem={({ item }) =>
+            item.type === 'header' ? (
+              <Text style={styles.sectionTitle}>{item.title}</Text>
+            ) : (
+              renderBirthdayCard(item.birthday)
+            )
+          }
           contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true }
-          )}
-          scrollEventThrottle={16}
         />
       )}
     </View>
   );
 };
 
-const styles = {
-    ...homescreenstyles,
-  
-  };
-  
+const styles = StyleSheet.create({
+  ...homescreenstyles,
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#333',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+});
+
 export default HomeScreen;
