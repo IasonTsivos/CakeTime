@@ -13,10 +13,7 @@ import { BlurView } from '@react-native-community/blur';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
-
-// Calculate number of avatars per row based on the screen width
-const itemsPerRow = 4; // Number of avatars per row
-const avatarSize = (width - 40) / itemsPerRow - 10;  // Adjust avatar size dynamically based on the screen width
+const avatarSize = width / 5 - 30;  // Adjusted avatar size for smaller screens
 
 const avatars = [
   '🐶', '🐱', '🦊', '🐵',
@@ -56,7 +53,7 @@ export default function AvatarPicker({
 
             <FlatList
               data={avatars}
-              numColumns={itemsPerRow}  // Use dynamic number of columns
+              numColumns={4}
               keyExtractor={(item) => item}
               contentContainerStyle={styles.listContainer}
               renderItem={({ item }) => (
@@ -106,7 +103,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     width: '100%',
-    maxHeight: '70%',
+    maxHeight: '100%',
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',

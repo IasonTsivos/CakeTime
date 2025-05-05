@@ -21,6 +21,7 @@ import { format } from 'date-fns';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLayoutEffect } from 'react';
 import HomeScreen from './HomeScreen';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
