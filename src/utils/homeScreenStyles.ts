@@ -10,18 +10,11 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 40 : 20,
     paddingHorizontal: 12,
   },
-  backgroundImage: {
-    opacity: 0.1,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-  },
-  loadingAnimation: {
-    width: 200,
-    height: 200,
   },
   header: {
     flexDirection: 'row',
@@ -79,7 +72,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   avatar: {
-    fontSize: 36,
+    fontSize: 46,
   },
   details: {
     flex: 1,

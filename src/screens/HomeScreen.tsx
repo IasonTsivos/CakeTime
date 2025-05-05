@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { getBirthdays } from '../utils/storage';
 import { Birthday } from '../types/Birthday';
-import { parseISO, format, isBefore, addYears, differenceInDays } from 'date-fns';
+import { parseISO, format, isBefore, addYears, differenceInDays, startOfDay } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
@@ -46,17 +46,20 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     React.useCallback(() => {
       const loadBirthdays = async () => {
         try {
-          const saved = await getBirthdays();
-          const today = new Date();
-          const sorted = saved.sort((a, b) => {
-            const aDate = parseISO(a.date);
-            const bDate = parseISO(b.date);
-            const aNext = new Date(aDate.setFullYear(today.getFullYear()));
-            const bNext = new Date(bDate.setFullYear(today.getFullYear()));
-            if (isBefore(aNext, today)) aNext.setFullYear(today.getFullYear() + 1);
-            if (isBefore(bNext, today)) bNext.setFullYear(today.getFullYear() + 1);
-            return aNext.getTime() - bNext.getTime();
-          });
+            const saved: Birthday[] = await getBirthdays();
+            const today = startOfDay(new Date());
+            const sorted = saved.sort((a, b) => {
+              const aDate = startOfDay(parseISO(a.date));
+              const bDate = startOfDay(parseISO(b.date));
+            
+              let aNext = startOfDay(new Date(aDate.setFullYear(today.getFullYear())));
+              let bNext = startOfDay(new Date(bDate.setFullYear(today.getFullYear())));
+            
+              if (isBefore(aNext, today)) aNext = startOfDay(addYears(aNext, 1));
+              if (isBefore(bNext, today)) bNext = startOfDay(addYears(bNext, 1));
+            
+              return aNext.getTime() - bNext.getTime();
+            });
           setBirthdays(sorted);
         } catch (error) {
           console.error('Error loading birthdays:', error);
@@ -70,10 +73,12 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   );
 
   const getDaysUntilBirthday = (dateString: string) => {
-    const today = new Date();
+    const today = startOfDay(new Date());
     const birthDate = parseISO(dateString);
-    let nextBirthday = new Date(birthDate.setFullYear(today.getFullYear()));
-    if (isBefore(nextBirthday, today)) nextBirthday = addYears(nextBirthday, 1);
+    let nextBirthday = startOfDay(new Date(birthDate.setFullYear(today.getFullYear())));
+    if (isBefore(nextBirthday, today)) {
+      nextBirthday = startOfDay(addYears(nextBirthday, 1));
+    }
     const days = differenceInDays(nextBirthday, today);
     return days === 0 ? "Today!" : days === 1 ? "Tomorrow!" : `${days} days`;
   };

@@ -22,6 +22,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useLayoutEffect } from 'react';
 import HomeScreen from './HomeScreen';
 import { useFocusEffect } from '@react-navigation/native';
+import { Image } from 'react-native';
+import AnimatedLottieView from 'lottie-react-native';
+
 
 const { width } = Dimensions.get('window');
 
@@ -85,11 +88,16 @@ export default function AddBirthdayScreen() {
   };
 
   return (
+    
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#fdf2f2', '#fff']}
-        style={StyleSheet.absoluteFill}
-      />
+    {/* 🔵 Lottie Background Animation */}
+    <AnimatedLottieView
+      source={require('../assets/animations/bg-animation.json')} // Adjust path if needed
+      autoPlay
+      loop
+      style={styles.backgroundAnimation}
+    />
+
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
@@ -282,6 +290,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  backgroundAnimation: {
+    position: 'absolute',
+    width,
+    height: Dimensions.get('window').height,
+    top: 0,
+    left: 0,
+    zIndex: -1,
+    opacity: 0.4,
+  },
   button: {
     marginTop: 30,
     borderRadius: 12,
@@ -307,4 +324,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginRight: 10,
   },
+  
 });
