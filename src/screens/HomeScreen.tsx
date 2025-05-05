@@ -18,7 +18,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ColorValue } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native'; 
+import { useFocusEffect,useRoute } from '@react-navigation/native'; 
 import homescreenstyles from '../utils/homeScreenStyles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -26,10 +26,12 @@ const { width,height } = Dimensions.get('window');
 const CARD_WIDTH = width - 40;
 
 type RootStackParamList = {
-  Home: undefined;
-  BirthdayDetails: { birthday: Birthday };
-  AddBirthday: undefined;
-};
+    Home: undefined;
+    BirthdayDetails: { birthday: Birthday };
+    AddBirthday: undefined;
+    EditBirthday: { birthday: Birthday }; // ✅ Add this line
+  };
+  
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -104,7 +106,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         <TouchableOpacity
           style={styles.birthdayCard}
           activeOpacity={0.9}
-          onPress={() => navigation.navigate('BirthdayDetails', { birthday: item })}
+          onPress={() => navigation.navigate('EditBirthday', { birthday: item })}
         >
           <LinearGradient
             colors={colors}

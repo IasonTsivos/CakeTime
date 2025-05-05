@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from './src/screens/HomeScreen';
 import AddBirthdayScreen from './src/screens/AddBirthdayScreen';
+import HomeStackNavigator from './src/navigation/HomeStackNavigator';
 
 type RootTabParamList = {
   Home: undefined;
@@ -29,8 +30,9 @@ const App = () => {
       >
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
+          component={HomeStackNavigator} 
           options={{
+            headerShown: false, // Hides the header for the HomeStackNavigator
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="gift-outline" size={size} color={color} />
             ),
