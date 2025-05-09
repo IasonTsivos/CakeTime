@@ -271,6 +271,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         />
       )}
     </View>
+    
   );
 };
 
