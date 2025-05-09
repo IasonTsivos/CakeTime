@@ -28,11 +28,13 @@ import AnimatedLottieView from 'lottie-react-native';
 
 const { width } = Dimensions.get('window');
 
+
 export default function AddBirthdayScreen() {
   const navigation = useNavigation();
 
   const [name, setName] = useState('');
   const [birthday, setBirthday] = useState(new Date());
+  const [tempDate, setTempDate] = useState(new Date()); // new temp state
   const [avatar, setAvatar] = useState('🎂');
   const [wish, setWish] = useState('');
   const [giftIdeas, setGiftIdeas] = useState('');
@@ -47,7 +49,7 @@ export default function AddBirthdayScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, HomeScreen]);
+  }, [navigation]);
 
   const handleAddBirthday = async () => {
     if (!name) {
@@ -69,40 +71,36 @@ export default function AddBirthdayScreen() {
       Alert.alert(
         'Success!',
         `${name}'s birthday was saved successfully!`,
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
     } catch (error) {
       Alert.alert('Error', 'There was a problem saving the birthday.');
     }
   };
 
-  const handleConfirmDate = (event: any, selectedDate: Date | undefined) => {
-    const currentDate = selectedDate || birthday;
-    setBirthday(currentDate);
-    setDatePickerVisible(false);
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    if (event.type === 'dismissed') {
+      setDatePickerVisible(false);
+      return;
+    }
+    if (selectedDate) {
+      setTempDate(selectedDate);
+    }
   };
 
   return (
-    
     <View style={styles.container}>
-    {/* 🔵 Lottie Background Animation */}
-    <AnimatedLottieView
-      source={require('../assets/animations/bg-animation.json')} // Adjust path if needed
-      autoPlay
-      loop
-      style={styles.backgroundAnimation}
-    />
+      <AnimatedLottieView
+        source={require('../assets/animations/bg-animation.json')}
+        autoPlay
+        loop
+        style={styles.backgroundAnimation}
+      />
 
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Avatar Picker */}
         <TouchableOpacity
           style={styles.avatarCircle}
           onPress={() => setShowAvatarPicker(true)}
@@ -120,9 +118,7 @@ export default function AddBirthdayScreen() {
           onSelect={setAvatar}
         />
 
-        {/* Form */}
         <View style={styles.formContainer}>
-          {/* Name Field */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Name</Text>
             <TextInput
@@ -135,11 +131,13 @@ export default function AddBirthdayScreen() {
             />
           </View>
 
-          {/* Birthday Field */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Birthday</Text>
             <TouchableOpacity 
-              onPress={() => setDatePickerVisible(true)}
+              onPress={() => {
+                setTempDate(birthday); // sync temp
+                setDatePickerVisible(true);
+              }}
               activeOpacity={0.7}
             >
               <View style={styles.input}>
@@ -152,17 +150,33 @@ export default function AddBirthdayScreen() {
           </View>
 
           {isDatePickerVisible && (
-            <DateTimePicker
-              value={birthday}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleConfirmDate}
-              textColor="#ff6b81"
-              accentColor="#ff6b81"
-            />
+            <>
+              <DateTimePicker
+                value={tempDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleDateChange}
+              />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setBirthday(tempDate);
+                    setDatePickerVisible(false);
+                  }}
+                  style={{ padding: 10, backgroundColor: '#ff6b81', borderRadius: 8 }}
+                >
+                  <Text style={{ color: 'white', fontWeight: 'bold' }}>Confirm</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setDatePickerVisible(false)}
+                  style={{ padding: 10, backgroundColor: '#ccc', borderRadius: 8 }}
+                >
+                  <Text style={{ color: 'black' }}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </>
           )}
 
-          {/* Wish Field */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Birthday Wish (Optional)</Text>
             <TextInput
@@ -175,7 +189,6 @@ export default function AddBirthdayScreen() {
             />
           </View>
 
-          {/* Gift Ideas Field */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Gift Ideas (Optional)</Text>
             <TextInput
@@ -188,7 +201,6 @@ export default function AddBirthdayScreen() {
             />
           </View>
 
-          {/* Save Button */}
           <TouchableOpacity 
             style={styles.button} 
             onPress={handleAddBirthday}
@@ -209,7 +221,6 @@ export default function AddBirthdayScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

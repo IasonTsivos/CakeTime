@@ -9,7 +9,6 @@ import {
   Animated,
   ColorValue,
 } from 'react-native';
-import { ScrollView } from 'react-native';
 import { getBirthdays } from '../utils/storage';
 import { Birthday } from '../types/Birthday';
 import {
@@ -28,9 +27,18 @@ import LottieView from 'lottie-react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import homescreenstyles from '../utils/homeScreenStyles';
-import AddBirthday from '../screens/AddBirthdayScreen';
 
 const { width } = Dimensions.get('window');
+
+
+const getCardColors = (
+  daysText: string,
+  isUpcoming: boolean
+): [ColorValue, ColorValue] => {
+  if (isUpcoming) return ['#ff3399', '#ffff00'];
+  return getBackgroundColor(daysText);
+};
+
 
 type RootStackParamList = {
   Home: undefined;
@@ -49,26 +57,20 @@ type ListItem = { type: 'header'; title: string } | { type: 'item'; birthday: Bi
 const CARD_WIDTH = width - 40;
 
 const getNextAge = (dateString: string) => {
-    const birthDate = parseISO(dateString);
-    const today = new Date();
-  
-    const birthMonth = birthDate.getMonth();
-    const birthDay = birthDate.getDate();
-  
-    let age = today.getFullYear() - birthDate.getFullYear();
-  
-    // If birthday hasn't occurred yet this year, subtract 1
-    if (
-      today.getMonth() < birthMonth ||
-      (today.getMonth() === birthMonth && today.getDate() < birthDay)
-    ) {
-      age--;
-    }
-  
-    return age + 1; // because we want the upcoming age
-  };
-  
-  
+  const birthDate = parseISO(dateString);
+  const today = new Date();
+  const birthMonth = birthDate.getMonth();
+  const birthDay = birthDate.getDate();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  if (
+    today.getMonth() < birthMonth ||
+    (today.getMonth() === birthMonth && today.getDate() < birthDay)
+  ) {
+    age--;
+  }
+  return age + 1;
+};
+
 const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
   if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
   if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
@@ -89,12 +91,10 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           const sorted = saved.sort((a, b) => {
             const aDate = startOfDay(parseISO(a.date));
             const bDate = startOfDay(parseISO(b.date));
-            let aNext = startOfDay(new Date(aDate.setFullYear(today.getFullYear())));
-            let bNext = startOfDay(new Date(bDate.setFullYear(today.getFullYear())));
-
+            let aNext = new Date(aDate.setFullYear(today.getFullYear()));
+            let bNext = new Date(bDate.setFullYear(today.getFullYear()));
             if (isBefore(aNext, today)) aNext = addYears(aNext, 1);
             if (isBefore(bNext, today)) bNext = addYears(bNext, 1);
-
             return aNext.getTime() - bNext.getTime();
           });
           setBirthdays(sorted);
@@ -123,23 +123,30 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
   const groupBirthdays = (birthdays: Birthday[]) => {
     const today = startOfDay(new Date());
+    const allWithNextDates = birthdays.map((birthday) => {
+      const bDate = parseISO(birthday.date);
+      let nextBday = new Date(bDate.setFullYear(today.getFullYear()));
+      nextBday = startOfDay(nextBday);
+      if (isBefore(nextBday, today)) nextBday = addYears(nextBday, 1);
+      return { birthday, nextBday };
+    });
+
+    allWithNextDates.sort((a, b) => a.nextBday.getTime() - b.nextBday.getTime());
+
     const upcoming: Birthday[] = [];
     const thisWeek: Birthday[] = [];
     const thisMonth: Birthday[] = [];
     const next6Months: Birthday[] = [];
     const rest: Birthday[] = [];
 
-    birthdays.forEach((birthday) => {
-      const bDate = parseISO(birthday.date);
-      let nextBday = new Date(bDate.setFullYear(today.getFullYear()));
-      nextBday = startOfDay(nextBday);
-      if (isBefore(nextBday, today)) nextBday = addYears(nextBday, 1);
+    if (allWithNextDates.length > 0) {
+      upcoming.push(allWithNextDates[0].birthday);
+      allWithNextDates.shift();
+    }
 
+    allWithNextDates.forEach(({ birthday, nextBday }) => {
       const daysUntil = differenceInDays(nextBday, today);
-      if (daysUntil < 0) return;
-
-      if (daysUntil === 0) upcoming.push(birthday);
-      else if (isThisWeek(nextBday)) thisWeek.push(birthday);
+      if (isThisWeek(nextBday)) thisWeek.push(birthday);
       else if (isThisMonth(nextBday)) thisMonth.push(birthday);
       else if (daysUntil <= 180) next6Months.push(birthday);
       else rest.push(birthday);
@@ -171,9 +178,11 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     return flatListData;
   };
 
-  const renderBirthdayCard = (birthday: Birthday) => {
+  const flatListData = buildFlatListData();
+
+  const renderBirthdayCard = (birthday: Birthday, isFirstUpcoming = false) => {
     const daysText = getDaysUntilBirthday(birthday.date);
-    const colors = getBackgroundColor(daysText);
+    const colors = getCardColors(daysText, isFirstUpcoming);
 
     return (
       <TouchableOpacity
@@ -196,12 +205,21 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
               <Text style={styles.date}>{format(parseISO(birthday.date), 'MMMM do')}</Text>
             </View>
             <View style={styles.ageContainer}>
-                <Text style={styles.ageText}>{getNextAge(birthday.date)}</Text>
-                <Text style={styles.daysSubtext}>
-                    {getDaysUntilBirthday(birthday.date).replace('!', '')}
-                </Text>
-                </View>
+              <Text style={styles.ageText}>{getNextAge(birthday.date)}</Text>
+              <Text style={styles.daysSubtext}>
+                {daysText.replace('!', '')}
+              </Text>
+            </View>
           </View>
+
+          {isFirstUpcoming && (
+            <LottieView
+              source={require('../assets/animations/confetti.json')}
+              autoPlay
+              loop
+              style={styles.confettiAnimation}
+            />
+          )}
         </LinearGradient>
       </TouchableOpacity>
     );
@@ -231,15 +249,22 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         </View>
       ) : (
         <FlatList
-          data={buildFlatListData()}
+          data={flatListData}
           keyExtractor={(item, index) =>
             item.type === 'header' ? `header-${item.title}` : item.birthday.id
           }
-          renderItem={({ item }) =>
+          renderItem={({ item, index }) =>
             item.type === 'header' ? (
               <Text style={styles.sectionTitle}>{item.title}</Text>
             ) : (
-              renderBirthdayCard(item.birthday)
+              renderBirthdayCard(
+                item.birthday,
+                index > 0 &&
+                  flatListData[0].type === 'header' &&
+                  flatListData[0].title === 'Upcoming' &&
+                  flatListData[1].type === 'item' &&
+                  flatListData[1].birthday.id === item.birthday.id
+              )
             )
           }
           contentContainerStyle={styles.list}
@@ -257,6 +282,14 @@ const styles = StyleSheet.create({
     color: '#333',
     marginTop: 20,
     marginBottom: 10,
+  },
+  confettiAnimation: {
+    position: 'absolute',
+    top: -20,
+    right: 0,
+    width: 100,
+    height: 100,
+    zIndex: 1,
   },
 });
 
