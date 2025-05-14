@@ -9,6 +9,8 @@ import {
   ScrollView,
   Dimensions,
   Platform,
+  KeyboardAvoidingView,
+  Image as RNImage,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -20,8 +22,8 @@ import { Birthday } from '../types/Birthday';
 import AvatarPicker from '../components/AvatarPicker';
 import { deleteBirthday, updateBirthday } from '../utils/storage';
 import AnimatedLottieView from 'lottie-react-native';
-import { RootStackParamList } from '../types/navigation'; 
-
+import { RootStackParamList } from '../types/navigation';
+import { Image } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -55,7 +57,7 @@ export default function EditBirthdayScreen() {
       Alert.alert('Please enter a name');
       return;
     }
-  
+
     const updatedBirthday: Birthday = {
       ...birthday,
       name,
@@ -64,15 +66,15 @@ export default function EditBirthdayScreen() {
       wish,
       giftIdeas,
     };
-  
+
     try {
-      await updateBirthday(updatedBirthday); // Update the birthday
-      navigation.navigate('Home', { refresh: true }); // Navigate back without showing an alert
+      await updateBirthday(updatedBirthday);
+      navigation.navigate('Home', { refresh: true });
     } catch (e) {
-      Alert.alert('Error', 'Failed to update birthday'); // Still show an alert on error
+      Alert.alert('Error', 'Failed to update birthday');
     }
-  }    
-  
+  };
+
   const handleDelete = () => {
     Alert.alert('Delete Birthday', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
@@ -81,8 +83,8 @@ export default function EditBirthdayScreen() {
         style: 'destructive',
         onPress: async () => {
           try {
-            await deleteBirthday(birthday.id); // Delete the birthday by ID
-            navigation.navigate('Home', { refresh: true }); // Go back to the Home screen with a refresh
+            await deleteBirthday(birthday.id);
+            navigation.navigate('Home', { refresh: true });
           } catch (e) {
             Alert.alert('Error', 'Could not delete birthday');
           }
@@ -90,29 +92,44 @@ export default function EditBirthdayScreen() {
       },
     ]);
   };
-  
 
   return (
-    <View style={styles.container}>
-      <AnimatedLottieView
-        source={require('../assets/animations/bg-animation.json')}
-        autoPlay
-        loop
-        style={styles.backgroundAnimation}
-      />
-      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+  <View style={styles.container}>
+    <AnimatedLottieView
+      source={require('../assets/animations/bg-animation.json')}
+      autoPlay
+      loop
+      style={styles.backgroundAnimation}
+    />
+
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // adjust if needed
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
         <TouchableOpacity
           style={styles.avatarCircle}
           onPress={() => setShowAvatarPicker(true)}
           activeOpacity={0.8}
         >
-          <Text style={styles.avatarTextBig}>{avatar}</Text>
+          <Image source={{ uri: avatar }} style={styles.avatarImage} resizeMode="contain" />
           <View style={styles.editAvatarBadge}>
             <MaterialIcons name="edit" size={16} color="white" />
           </View>
         </TouchableOpacity>
 
-        <AvatarPicker visible={showAvatarPicker} onClose={() => setShowAvatarPicker(false)} onSelect={setAvatar} />
+        <AvatarPicker
+          visible={showAvatarPicker}
+          onClose={() => setShowAvatarPicker(false)}
+          onSelect={(selectedAvatar: any) => {
+            const uri = RNImage.resolveAssetSource(selectedAvatar).uri;
+            setAvatar(uri);
+          }}
+        />
 
         <View style={styles.formContainer}>
           <Text style={styles.label}>Name</Text>
@@ -144,11 +161,16 @@ export default function EditBirthdayScreen() {
           )}
 
           <Text style={styles.label}>Wish</Text>
-          <TextInput style={[styles.input, { height: 100 }]} value={wish} onChangeText={setWish} multiline />
+          <TextInput
+            style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+            value={wish}
+            onChangeText={setWish}
+            multiline
+          />
 
           <Text style={styles.label}>Gift Ideas</Text>
           <TextInput
-            style={[styles.input, { height: 100 }]}
+            style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
             value={giftIdeas}
             onChangeText={setGiftIdeas}
             multiline
@@ -169,8 +191,10 @@ export default function EditBirthdayScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
-  );
+    </KeyboardAvoidingView>
+  </View>
+);
+
 }
 
 const styles = StyleSheet.create({
@@ -194,8 +218,17 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderWidth: 3,
     borderColor: '#ff6b81',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  avatarTextBig: { fontSize: 60 },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 40,
+  },
   editAvatarBadge: {
     position: 'absolute',
     bottom: 0,

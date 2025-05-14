@@ -27,6 +27,11 @@ const avatars = [
   require('../assets/present.png'),
   require('../assets/strawberry.png'),
   require('../assets/girlhat.png'),
+  require('../assets/dad.png'),
+  require('../assets/lion.png'),
+  require('../assets/shiba.png'),
+  require('../assets/catpresent.png'),
+  require('../assets/bear.png'),
 ];
 
 interface AvatarPickerProps {

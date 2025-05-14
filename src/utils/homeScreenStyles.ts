@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarContainer: {
-    width: 70, // Keep original size to avoid scaling the card
-    height: 70,
+    width: 80, // Keep original size to avoid scaling the card
+    height: 80,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 0, // Remove margin, we'll add padding in 'details'
@@ -156,6 +156,25 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 8,
   },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#333',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  confettiAnimation: {
+    position: 'absolute',
+    top: -20,
+    right: 0,
+    width: 100,
+    height: 100,
+    zIndex: 1,
+  },
+  avatarImage: {
+  width: 50,
+  height: 50,
+},
 });
 
 export default styles;

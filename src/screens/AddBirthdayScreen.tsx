@@ -9,6 +9,7 @@ import {
   ScrollView,
   Dimensions,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import uuid from 'react-native-uuid';
@@ -24,6 +25,7 @@ import HomeScreen from './HomeScreen';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedLottieView from 'lottie-react-native';
 import { Image, Image as RNImage } from 'react-native';
+
 
 
 
@@ -93,15 +95,20 @@ export default function AddBirthdayScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <AnimatedLottieView
-        source={require('../assets/animations/bg-animation.json')}
-        autoPlay
-        loop
-        style={styles.backgroundAnimation}
-      />
+  <View style={styles.container}>
+    <AnimatedLottieView
+      source={require('../assets/animations/bg-animation.json')}
+      autoPlay
+      loop
+      style={styles.backgroundAnimation}
+    />
 
-      <ScrollView 
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust if needed
+    >
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
@@ -125,7 +132,6 @@ export default function AddBirthdayScreen() {
           }}
         />
 
-
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Name</Text>
@@ -141,9 +147,9 @@ export default function AddBirthdayScreen() {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Birthday</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => {
-                setTempDate(birthday); // sync temp
+                setTempDate(birthday);
                 setDatePickerVisible(true);
               }}
               activeOpacity={0.7}
@@ -188,7 +194,7 @@ export default function AddBirthdayScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Birthday Wish (Optional)</Text>
             <TextInput
-              style={[styles.input, { height: 100 }]}
+              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
               placeholder="Write a pre-made birthday message..."
               placeholderTextColor="#999"
               value={wish}
@@ -200,7 +206,7 @@ export default function AddBirthdayScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Gift Ideas (Optional)</Text>
             <TextInput
-              style={[styles.input, { height: 100 }]}
+              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
               placeholder="Book, Perfume, Concert tickets..."
               placeholderTextColor="#999"
               value={giftIdeas}
@@ -209,8 +215,8 @@ export default function AddBirthdayScreen() {
             />
           </View>
 
-          <TouchableOpacity 
-            style={styles.button} 
+          <TouchableOpacity
+            style={styles.button}
             onPress={handleAddBirthday}
             activeOpacity={0.8}
           >
@@ -226,8 +232,10 @@ export default function AddBirthdayScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
-  );
+    </KeyboardAvoidingView>
+  </View>
+);
+
 }
 const styles = StyleSheet.create({
   container: {

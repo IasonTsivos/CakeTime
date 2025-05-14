@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 type RootStackParamList = {
   Intro: undefined;
@@ -19,32 +21,37 @@ const IntroSlider = () => {
   const [slideIndex, setSlideIndex] = useState(0);
 
   const slides = [
-    {
-      key: 'slide1',
-      title: 'Welcome to CakeTime!',
-      text: 'Never miss a birthday again.',
-      image: require('../assets/intro1.png'),
-    },
-    {
-      key: 'slide2',
-      title: 'Organize birthdays easily',
-      text: 'All your friends in one place.',
-      image: require('../assets/intro1.png'),
-    },
-    {
-      key: 'slide3',
-      title: 'Celebrate together!',
-      text: 'Send love on their special day.',
-      image: require('../assets/intro1.png'),
-    },
-    {
-      key: 'slide4',
-      title: 'What’s your name?',
-      text: '',
-      image: null,
-      inputSlide: true,
-    },
-  ];
+  {
+    key: 'slide1',
+    title: 'Welcome to CakeTime!',
+    text: 'Let’s celebrate and remember Birthdays together.',
+    image: require('../assets/int1.png'),
+    colors: ['#f9980c', '#ffffff'],
+  },
+  {
+    key: 'slide2',
+    title: 'Keep track of Birthdays',
+    text: 'Get reminders for all your important days.',
+    image: require('../assets/int2.png'),
+    colors: ['#5ACADB', '#F9F6F6'],
+  },
+  {
+    key: 'slide3',
+    title: 'Make loved ones Smile',
+    text: 'Never forget to send your best wishes.',
+    image: require('../assets/int3.png'),
+    colors: ['#ffe4e9', '#fdfdff'],
+  },
+  {
+    key: 'slide4',
+    title: 'What’s your name?',
+    text: '',
+    image: null,
+    inputSlide: true,
+    colors: ['#ffe4e9', '#ffffff'],
+  },
+];
+
 
   const handleContinue = async () => {
     if (!userName.trim()) return;
@@ -53,99 +60,141 @@ const IntroSlider = () => {
     navigation.replace('HomeTabs');
   };
 
-  const renderItem = ({ item }: any) => {
-    if (item.inputSlide) {
-      return (
-        <View style={styles.slide}>
-          <Text style={styles.title}>{item.title}</Text>
-          <TextInput
-            placeholder="Enter your name"
-            value={userName}
-            onChangeText={setUserName}
-            style={styles.input}
-          />
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: userName ? '#ff6b81' : '#ccc' }]}
-            onPress={handleContinue}
-            disabled={!userName}
-          >
-            <Text style={styles.buttonText}>Continue</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+const renderItem = ({ item }: any) => {
+  const isLastSlide = item.inputSlide;
 
-    return (
-      <View style={styles.slide}>
-        <Image source={item.image} style={styles.image} resizeMode="contain" />
+  return (
+    <LinearGradient colors={item.colors || ['#fff', '#fff']} style={styles.slide}>
+      <View style={[styles.contentWrapper, isLastSlide && styles.centeredContent]}>
+        {item.image && (
+          <View style={styles.imageContainer}>
+            <Image source={item.image} style={styles.image} resizeMode="contain" />
+          </View>
+        )}
         <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.text}>{item.text}</Text>
+        {item.text !== '' && <Text style={styles.text}>{item.text}</Text>}
+
+        {isLastSlide && (
+          <>
+            <TextInput
+              placeholder="Enter your name"
+              value={userName}
+              onChangeText={setUserName}
+              style={styles.input}
+            />
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: userName ? '#ff6b81' : '#ccc' }]}
+              onPress={handleContinue}
+              disabled={!userName}
+            >
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
-    );
-  };
+    </LinearGradient>
+  );
+};
+
+
 
   return (
     <AppIntroSlider
       renderItem={renderItem}
       data={slides}
-      onDone={() => {}} // Not used since last slide is custom
-      showSkipButton
-      onSkip={async () => {
-        await AsyncStorage.setItem('hasSeenIntro', 'true');
-        navigation.replace('Welcome');
-      }}
       showNextButton={slideIndex < slides.length - 1}
-      showDoneButton={false}
       onSlideChange={(index) => setSlideIndex(index)}
+      activeDotStyle={styles.activeDot}  // Add this to style the active dot
     />
   );
 };
 
 const styles = StyleSheet.create({
   slide: {
-    flex: 1,
-    alignItems: 'center',
+    flex: 1, // Takes the full screen height
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#FFF',
-    padding: 20,
+  },
+  imageContainer: {
+    height: '60%', 
+    width: '100%', 
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
-    width: 300,
-    height: 300,
+    width: '70%', 
+    height: '70%', 
+  },
+  contentContainer: {
+    flex: 1, // Takes up the remaining 40% of the height of the screen
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 40,
-    color: '#333',
+    color: '#ff6b81',
     textAlign: 'center',
+    fontFamily: 'Avenir Next',
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
-    color: '#666',
+    color: '#333',
+    paddingHorizontal: 20,
   },
   input: {
     marginTop: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderWidth: 2,
+    borderColor: '#ff6b81',
     borderRadius: 10,
-    padding: 10,
+    padding: 12,
     width: '80%',
-    fontSize: 16,
+    fontSize: 18,
+    fontFamily: 'Avenir Next',
+    backgroundColor: '#f9f9f9',
   },
   button: {
     marginTop: 30,
     paddingVertical: 12,
-    paddingHorizontal: 30,
+    paddingHorizontal: 40,
     borderRadius: 25,
+    backgroundColor: '#ff6b81',
+    shadowColor: '#ff6b81',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'Avenir Next',
   },
+  activeDot: {
+    backgroundColor: '#ff6b81',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  contentWrapper: {
+  flex: 1,
+  width: '100%',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  paddingTop: 60,
+},
+
+centeredContent: {
+  justifyContent: 'center',
+  paddingTop: 0,
+},
+
 });
+
 
 export default IntroSlider;

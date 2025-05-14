@@ -11,16 +11,7 @@ import {
 } from 'react-native';
 import { getBirthdays } from '../utils/storage';
 import { Birthday } from '../types/Birthday';
-import {
-  parseISO,
-  format,
-  isBefore,
-  addYears,
-  differenceInDays,
-  startOfDay,
-  isThisWeek,
-  isThisMonth,
-} from 'date-fns';
+import {parseISO,format, isBefore,addYears,differenceInDays, startOfDay, isThisWeek,isThisMonth, } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
@@ -75,7 +66,7 @@ const getNextAge = (dateString: string) => {
 const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
   if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
   if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
-  return ['#FEDEB8', '#FFFDD0'];
+  return ['#FFFDD0', '#FEDEB8'];
 };
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
@@ -281,25 +272,6 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
 const styles = StyleSheet.create({
   ...homescreenstyles,
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#333',
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  confettiAnimation: {
-    position: 'absolute',
-    top: -20,
-    right: 0,
-    width: 100,
-    height: 100,
-    zIndex: 1,
-  },
-  avatarImage: {
-  width: 50,
-  height: 50,
-},
 
 });
 
