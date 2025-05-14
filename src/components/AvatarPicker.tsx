@@ -8,25 +8,31 @@ import {
   FlatList,
   Dimensions,
   Platform,
+  Image,
 } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
-const avatarSize = width / 5 - 30;  // Adjusted avatar size for smaller screens
+const avatarSize = width / 5 - 30;
 
+// Replace with actual paths to your avatar PNGs
 const avatars = [
-  '🐶', '🐱', '🦊', '🐵',
-  '🐸', '🦄', '🐯', '🐼',
-  '🐷', '🐻', '🐰', '🐨',
-  '🦁', '🐮', '🐹', '🐲',
-  '🦉', '🐧', '🐺', '🦋',
+  require('../assets/boyhat.png'),
+  require('../assets/cathat.png'),
+  require('../assets/bunnyhat.png'),
+  require('../assets/monkey.png'),
+  require('../assets/girlblonde.png'),
+  require('../assets/piniatta.png'),
+  require('../assets/present.png'),
+  require('../assets/strawberry.png'),
+  require('../assets/girlhat.png'),
 ];
 
 interface AvatarPickerProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (avatar: string) => void;
+  onSelect: (avatar: any) => void; // avatar is now an image resource, not string
 }
 
 export default function AvatarPicker({
@@ -49,12 +55,12 @@ export default function AvatarPicker({
           exiting={FadeOut.duration(200)}
         >
           <View style={styles.modalContent}>
-            <Text style={styles.title}>Choose an Emoji Avatar</Text>
+            <Text style={styles.title}>Choose an Avatar</Text>
 
             <FlatList
               data={avatars}
               numColumns={4}
-              keyExtractor={(item) => item}
+              keyExtractor={(_, index) => index.toString()}
               contentContainerStyle={styles.listContainer}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -64,11 +70,9 @@ export default function AvatarPicker({
                     onClose();
                   }}
                 >
-                  <Text style={styles.avatar}>{item}</Text>
+                  <Image source={item} style={styles.avatarImage} resizeMode="contain" />
                 </TouchableOpacity>
               )}
-              initialNumToRender={8}
-              windowSize={4}
             />
 
             <TouchableOpacity
@@ -96,8 +100,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    width: '90%',  // Set modal width to 90% of screen width for better responsiveness
-    maxWidth: 350, // Max width to avoid modal becoming too large
+    width: '90%',
+    maxWidth: 350,
     paddingHorizontal: 20,
   },
   modalContent: {
@@ -107,10 +111,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
@@ -133,9 +134,11 @@ const styles = StyleSheet.create({
     margin: 5,
     backgroundColor: '#f8f8f8',
     borderRadius: avatarSize / 2,
+    overflow: 'hidden',
   },
-  avatar: {
-    fontSize: avatarSize * 0.6,
+  avatarImage: {
+    width: avatarSize * 0.8,
+    height: avatarSize * 0.8,
   },
   closeButton: {
     backgroundColor: '#ff6b81',

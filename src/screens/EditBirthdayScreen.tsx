@@ -20,7 +20,8 @@ import { Birthday } from '../types/Birthday';
 import AvatarPicker from '../components/AvatarPicker';
 import { deleteBirthday, updateBirthday } from '../utils/storage';
 import AnimatedLottieView from 'lottie-react-native';
-import { RootStackParamList } from '../types/navigation'; // 👈 Create this if not already
+import { RootStackParamList } from '../types/navigation'; 
+
 
 const { width } = Dimensions.get('window');
 

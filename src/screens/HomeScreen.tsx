@@ -27,6 +27,7 @@ import LottieView from 'lottie-react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import homescreenstyles from '../utils/homeScreenStyles';
+import { Image, Image as RNImage } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -74,7 +75,7 @@ const getNextAge = (dateString: string) => {
 const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
   if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
   if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
-  return ['#D4FC79', '#96E6A1'];
+  return ['#FEDEB8', '#FFFDD0'];
 };
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
@@ -197,7 +198,10 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.cardContent}>
-            <Text style={styles.avatar}>{birthday.avatar}</Text>
+            <Image
+              source={{ uri: birthday.avatar }}
+              style={styles.avatarImage}
+            />
             <View style={styles.details}>
               <Text style={styles.name} numberOfLines={1}>
                 {birthday.name}
@@ -292,6 +296,11 @@ const styles = StyleSheet.create({
     height: 100,
     zIndex: 1,
   },
+  avatarImage: {
+  width: 50,
+  height: 50,
+},
+
 });
 
 export default HomeScreen;

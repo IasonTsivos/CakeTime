@@ -22,8 +22,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useLayoutEffect } from 'react';
 import HomeScreen from './HomeScreen';
 import { useFocusEffect } from '@react-navigation/native';
-import { Image } from 'react-native';
 import AnimatedLottieView from 'lottie-react-native';
+import { Image, Image as RNImage } from 'react-native';
+
 
 
 const { width } = Dimensions.get('window');
@@ -34,8 +35,11 @@ export default function AddBirthdayScreen() {
 
   const [name, setName] = useState('');
   const [birthday, setBirthday] = useState(new Date());
-  const [tempDate, setTempDate] = useState(new Date()); // new temp state
-  const [avatar, setAvatar] = useState('🎂');
+  const [tempDate, setTempDate] = useState(new Date()); 
+  const [avatar, setAvatar] = useState<string>(
+  RNImage.resolveAssetSource(require('../assets/boyhat.png')).uri
+);
+
   const [wish, setWish] = useState('');
   const [giftIdeas, setGiftIdeas] = useState('');
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -106,7 +110,7 @@ export default function AddBirthdayScreen() {
           onPress={() => setShowAvatarPicker(true)}
           activeOpacity={0.8}
         >
-          <Text style={styles.avatarTextBig}>{avatar}</Text>
+          <Image source={{ uri: avatar }} style={styles.avatarImage} resizeMode="contain" />
           <View style={styles.editAvatarBadge}>
             <MaterialIcons name="edit" size={16} color="white" />
           </View>
@@ -115,8 +119,12 @@ export default function AddBirthdayScreen() {
         <AvatarPicker
           visible={showAvatarPicker}
           onClose={() => setShowAvatarPicker(false)}
-          onSelect={setAvatar}
+          onSelect={(selectedAvatar: any) => {
+            const uri = RNImage.resolveAssetSource(selectedAvatar).uri;
+            setAvatar(uri);
+          }}
         />
+
 
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
@@ -335,5 +343,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginRight: 10,
   },
-  
+  avatarImage: {
+  width: 100,
+  height: 100,
+  borderRadius: 40,
+},
+
 });
