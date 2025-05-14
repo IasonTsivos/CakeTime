@@ -111,7 +111,7 @@ const renderItem = ({ item }: any) => {
 
 const styles = StyleSheet.create({
   slide: {
-    flex: 1, // Takes the full screen height
+    flex: 1, 
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFF',
