@@ -38,7 +38,8 @@
     "react-native-uuid": "^2.0.3",
     "react-native-vector-icons": "^10.2.0",
     "react-navigation": "^5.0.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "expo-notifications": "~0.31.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

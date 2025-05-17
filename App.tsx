@@ -5,7 +5,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeTabs from './src/navigation/HomeStackNavigator';
 import IntroSlider from './src/screens/IntroSlider';
-import { ActivityIndicator, View } from 'react-native'; // For optional loading
+import { ActivityIndicator, View } from 'react-native';
+import * as Notifications from 'expo-notifications';
+
+// ✅ GLOBAL: Set up how notifications behave when app is foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true, // ✅ required in newer versions
+    shouldShowList: true
+  }),
+});
 
 type RootStackParamList = {
   Intro: undefined;
@@ -15,7 +27,7 @@ type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
-  const [initialRoute, setInitialRoute] = useState<'Intro' | 'HomeTabs' | null>(null); // null initially
+  const [initialRoute, setInitialRoute] = useState<'Intro' | 'HomeTabs' | null>(null);
 
   useEffect(() => {
     const checkStorage = async () => {
@@ -27,7 +39,6 @@ const App = () => {
   }, []);
 
   if (!initialRoute) {
-    // Optionally show splash or loading screen
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#ff6b81" />

@@ -29,6 +29,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import homescreenstyles from '../utils/homeScreenStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { requestNotificationPermission } from '../utils/requestNotification';
 
 const { width } = Dimensions.get('window');
 
@@ -44,6 +45,7 @@ type RootStackParamList = {
   Home: undefined;
   AddBirthday: undefined;
   EditBirthday: { birthday: Birthday };
+  Settings: undefined;
 };
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
@@ -84,7 +86,9 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const insets = useSafeAreaInsets();
 
   useFocusEffect(
+    
     React.useCallback(() => {
+    requestNotificationPermission();
       const loadBirthdays = async () => {
         try {
           const saved: Birthday[] = await getBirthdays();
@@ -275,6 +279,12 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           contentContainerStyle={styles.list}
         />
       )}
+      <TouchableOpacity
+        style={styles.settingsButton}
+        onPress={() => navigation.navigate('Settings')}
+      >
+        <MaterialIcons name="settings" size={28} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };

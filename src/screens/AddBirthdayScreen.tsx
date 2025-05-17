@@ -28,7 +28,6 @@ import { Image, Image as RNImage } from 'react-native';
 
 
 
-
 const { width } = Dimensions.get('window');
 
 
@@ -74,11 +73,6 @@ export default function AddBirthdayScreen() {
 
     try {
       await saveBirthday(newBirthday);
-      Alert.alert(
-        'Success!',
-        `${name}'s birthday was saved successfully!`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
     } catch (error) {
       Alert.alert('Error', 'There was a problem saving the birthday.');
     }

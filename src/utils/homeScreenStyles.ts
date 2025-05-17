@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Avenir Next' : 'sans-serif-condensed',
   },
   addButton: {
-    backgroundColor: '#ff6b81',
+    backgroundColor: '#ff8eec',
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -62,6 +62,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  settingsButton: {
+  position: 'absolute',
+  bottom: 30, // adjust for safe area if needed
+  right: 20,
+  backgroundColor: '#ff8eec', // pink to match theme, adjust as you like
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  justifyContent: 'center',
+  alignItems: 'center',
+  elevation: 5, // for shadow on Android
+  shadowColor: '#000', // iOS shadow
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 3,
+},
+
 avatarContainer: {
   width: 60,          // increase container size a bit if needed
   height: 60,
@@ -75,7 +92,6 @@ avatarContainer: {
 avatarImage: {
   width: 60,
   height: 60,
-  borderRadius: 30,
   },
   ageContainer: {
     alignItems: 'center',
