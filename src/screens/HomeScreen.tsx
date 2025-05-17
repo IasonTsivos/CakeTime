@@ -8,20 +8,29 @@ import {
   Dimensions,
   Animated,
   ColorValue,
+  Image,
 } from 'react-native';
 import { getBirthdays } from '../utils/storage';
 import { Birthday } from '../types/Birthday';
-import {parseISO,format, isBefore,addYears,differenceInDays, startOfDay, isThisWeek,isThisMonth, } from 'date-fns';
+import {
+  parseISO,
+  format,
+  isBefore,
+  addYears,
+  differenceInDays,
+  startOfDay,
+  isThisWeek,
+  isThisMonth,
+} from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import homescreenstyles from '../utils/homeScreenStyles';
-import { Image, Image as RNImage } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
-
 
 const getCardColors = (
   daysText: string,
@@ -30,7 +39,6 @@ const getCardColors = (
   if (isUpcoming) return ['#ff3399', '#ffff00'];
   return getBackgroundColor(daysText);
 };
-
 
 type RootStackParamList = {
   Home: undefined;
@@ -73,6 +81,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [loading, setLoading] = useState(true);
   const scrollY = new Animated.Value(0);
+  const insets = useSafeAreaInsets();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -221,7 +230,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top - 30 }]}>
       <LottieView
         source={require('../assets/animations/bg-animation.json')}
         autoPlay
@@ -266,13 +275,11 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         />
       )}
     </View>
-    
   );
 };
 
 const styles = StyleSheet.create({
   ...homescreenstyles,
-
 });
 
 export default HomeScreen;

@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeTabs from './src/navigation/HomeStackNavigator';
 import IntroSlider from './src/screens/IntroSlider';
+import { ActivityIndicator, View } from 'react-native'; // For optional loading
 
 type RootStackParamList = {
   Intro: undefined;
@@ -14,22 +15,25 @@ type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
-  const [initialRoute, setInitialRoute] = useState<'Intro' | 'HomeTabs'>('Intro');
+  const [initialRoute, setInitialRoute] = useState<'Intro' | 'HomeTabs' | null>(null); // null initially
 
   useEffect(() => {
     const checkStorage = async () => {
       const hasSeenIntro = await AsyncStorage.getItem('hasSeenIntro');
-      const userName = await AsyncStorage.getItem('userName');
-
-      if (!hasSeenIntro) {
-        setInitialRoute('Intro');
-      } else {
-        setInitialRoute('HomeTabs');
-      }
+      setInitialRoute(hasSeenIntro === 'true' ? 'HomeTabs' : 'Intro');
     };
 
     checkStorage();
   }, []);
+
+  if (!initialRoute) {
+    // Optionally show splash or loading screen
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ff6b81" />
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>

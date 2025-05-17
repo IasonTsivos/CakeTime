@@ -1,38 +1,41 @@
-
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import EditBirthdayScreen from '../screens/EditBirthdayScreen';
 import AddBirthdayScreen from '../screens/AddBirthdayScreen';
+import CustomHeader from '../components/CustomHeader';
 
 export type HomeStackParamList = {
   Home: undefined;
-  EditBirthday: { birthday: any }; 
-  AddBirthday: undefined; 
+  EditBirthday: { birthday: any };
+  AddBirthday: undefined;
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
 const HomeStackNavigator = () => {
   return (
-    <Stack.Navigator>
+<Stack.Navigator
+  screenOptions={{
+    header: () => <CustomHeader title="🎉 Birthdays" showBackButton={false} />,
+  }}
+>
   <Stack.Screen
     name="Home"
     component={HomeScreen}
-    options={{ headerTitle: 'Home' }}
+    options={{ header: () => <CustomHeader title="🎉 Birthdays" showBackButton={false} /> }}
   />
   <Stack.Screen
     name="EditBirthday"
     component={EditBirthdayScreen}
-    options={{ headerTitle: 'Edit' }} // 👈 Hides the header here
+    options={{ header: () => <CustomHeader title="🎂 Edit Birthday" /> }}
   />
   <Stack.Screen
     name="AddBirthday"
     component={AddBirthdayScreen}
-    options={{ headerTitle: 'Add Birthday' }} // 👈 Hides the header here
+    options={{ header: () => <CustomHeader title="➕ Add Birthday" /> }}
   />
 </Stack.Navigator>
-
   );
 };
 

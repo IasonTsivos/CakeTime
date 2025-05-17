@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
       top: 0,
       left: 0,
       zIndex: -1,
-      opacity: 0.4,
+      opacity: 0.6,
     },
   confetti: {
     position: 'absolute',

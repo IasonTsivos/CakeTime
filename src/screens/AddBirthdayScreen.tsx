@@ -51,7 +51,7 @@ export default function AddBirthdayScreen() {
     navigation.setOptions({
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 15 }}>
-          <MaterialIcons name="arrow-back" size={24} color="#ff6b81" />
+          <MaterialIcons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
       ),
     });
