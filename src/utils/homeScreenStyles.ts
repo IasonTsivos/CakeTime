@@ -62,12 +62,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  avatarContainer: {
-    width: 80, // Keep original size to avoid scaling the card
-    height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 0, // Remove margin, we'll add padding in 'details'
+avatarContainer: {
+  width: 60,          // increase container size a bit if needed
+  height: 60,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: 15,
+  borderRadius: 30,   // half width/height to make circle container (optional)
+  overflow: 'hidden', // to clip image inside circle
+  backgroundColor: '#fff', // or transparent, depends on design
+},
+avatarImage: {
+  width: 60,
+  height: 60,
+  borderRadius: 30,
   },
   ageContainer: {
     alignItems: 'center',
@@ -171,10 +179,6 @@ const styles = StyleSheet.create({
     height: 100,
     zIndex: 1,
   },
-  avatarImage: {
-  width: 50,
-  height: 50,
-},
 });
 
 export default styles;

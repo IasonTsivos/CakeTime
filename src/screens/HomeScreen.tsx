@@ -198,10 +198,11 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.cardContent}>
-            <Image
-              source={{ uri: birthday.avatar }}
-              style={styles.avatarImage}
-            />
+              <Image
+                source={{ uri: birthday.avatar }}
+                style={styles.avatarImage}
+                resizeMode='contain'
+              />
             <View style={styles.details}>
               <Text style={styles.name} numberOfLines={1}>
                 {birthday.name}

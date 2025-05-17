@@ -17,7 +17,7 @@ const HomeStackNavigator = () => {
   return (
 <Stack.Navigator
   screenOptions={{
-    header: () => <CustomHeader title="🎉 Birthdays" showBackButton={false} />,
+    header: () => <CustomHeader title=" " showBackButton={false} />,
   }}
 >
   <Stack.Screen

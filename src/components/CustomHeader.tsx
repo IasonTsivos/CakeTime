@@ -23,7 +23,7 @@ const CustomHeader = ({ title, showBackButton = true }: Props) => {
       <View style={styles.inner}>
         {showBackButton && (
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialIcons name="arrow-back" size={24} color="#fff" />
+            <MaterialIcons name="arrow-back" size={24} color="#303030" />
           </TouchableOpacity>
         )}
         <Text style={styles.title}>{title}</Text>
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    color: '#fff',
+    color: '#303030',
     fontSize: 18,
     fontWeight: 'bold',
   },
