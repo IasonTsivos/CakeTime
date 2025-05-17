@@ -23,7 +23,7 @@ const HomeStackNavigator = () => {
   <Stack.Screen
     name="Home"
     component={HomeScreen}
-    options={{ header: () => <CustomHeader title="🎉 Birthdays" showBackButton={false} /> }}
+    options={{ header: () => <CustomHeader title=" " showBackButton={false} /> }}
   />
   <Stack.Screen
     name="EditBirthday"
@@ -33,7 +33,7 @@ const HomeStackNavigator = () => {
   <Stack.Screen
     name="AddBirthday"
     component={AddBirthdayScreen}
-    options={{ header: () => <CustomHeader title="➕ Add Birthday" /> }}
+    options={{ header: () => <CustomHeader title="🎂 Add Birthday" /> }}
   />
 </Stack.Navigator>
   );
