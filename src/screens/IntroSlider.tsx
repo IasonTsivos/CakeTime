@@ -5,6 +5,9 @@ import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
+import { db } from '../utils/firebaseConfig';
+import { collection, addDoc } from 'firebase/firestore';
+
 
 
 type RootStackParamList = {
@@ -53,12 +56,28 @@ const IntroSlider = () => {
 ];
 
 
-  const handleContinue = async () => {
-    if (!userName.trim()) return;
+const handleContinue = async () => {
+  const trimmedName = userName.trim();
+  if (trimmedName.length < 3) return;
+
+  try {
+    // Save name to AsyncStorage
     await AsyncStorage.setItem('hasSeenIntro', 'true');
-    await AsyncStorage.setItem('userName', userName.trim());
+    await AsyncStorage.setItem('userName', trimmedName);
+
+    // Add name to Firestore
+    await addDoc(collection(db,'CakeTime'), {
+      name: trimmedName,
+      createdAt: new Date().toISOString(),
+    });
+
+    // Navigate to home
     navigation.replace('HomeTabs');
-  };
+  } catch (error) {
+    console.error('Error saving user to Firestore:', error);
+  }
+};
+
 
 const renderItem = ({ item }: any) => {
   const isLastSlide = item.inputSlide;
