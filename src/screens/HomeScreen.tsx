@@ -33,13 +33,7 @@ import { requestNotificationPermission } from '../utils/requestNotification';
 
 const { width } = Dimensions.get('window');
 
-const getCardColors = (
-  daysText: string,
-  isUpcoming: boolean
-): [ColorValue, ColorValue] => {
-  if (isUpcoming) return ['#ff3399', '#ffff00'];
-  return getBackgroundColor(daysText);
-};
+const CARD_WIDTH = width - 40;
 
 type RootStackParamList = {
   Home: undefined;
@@ -56,8 +50,6 @@ interface HomeScreenProps {
 
 type ListItem = { type: 'header'; title: string } | { type: 'item'; birthday: Birthday };
 
-const CARD_WIDTH = width - 40;
-
 const getNextAge = (dateString: string) => {
   const birthDate = parseISO(dateString);
   const today = new Date();
@@ -73,6 +65,14 @@ const getNextAge = (dateString: string) => {
   return age + 1;
 };
 
+const getCardColors = (
+  daysText: string,
+  isUpcoming: boolean
+): [ColorValue, ColorValue] => {
+  if (isUpcoming) return ['#ff3399', '#ffff00'];
+  return getBackgroundColor(daysText);
+};
+
 const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
   if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
   if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
@@ -81,14 +81,13 @@ const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
+  const [upcomingBirthdayIds, setUpcomingBirthdayIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const scrollY = new Animated.Value(0);
   const insets = useSafeAreaInsets();
 
   useFocusEffect(
-    
     React.useCallback(() => {
-    requestNotificationPermission();
+      requestNotificationPermission();
       const loadBirthdays = async () => {
         try {
           const saved: Birthday[] = await getBirthdays();
@@ -102,7 +101,10 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
             if (isBefore(bNext, today)) bNext = addYears(bNext, 1);
             return aNext.getTime() - bNext.getTime();
           });
-          setBirthdays(sorted);
+
+          const { upcoming, thisWeek, thisMonth, next6Months, rest } = groupBirthdays(sorted);
+          setUpcomingBirthdayIds(new Set(upcoming.map((b) => b.id)));
+          setBirthdays([...upcoming, ...thisWeek, ...thisMonth, ...next6Months, ...rest]);
         } catch (error) {
           console.error('Error loading birthdays:', error);
         } finally {
@@ -128,6 +130,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
   const groupBirthdays = (birthdays: Birthday[]) => {
     const today = startOfDay(new Date());
+
     const allWithNextDates = birthdays.map((birthday) => {
       const bDate = parseISO(birthday.date);
       let nextBday = new Date(bDate.setFullYear(today.getFullYear()));
@@ -144,25 +147,32 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     const next6Months: Birthday[] = [];
     const rest: Birthday[] = [];
 
-    if (allWithNextDates.length > 0) {
-      upcoming.push(allWithNextDates[0].birthday);
-      allWithNextDates.shift();
-    }
+    let upcomingDate: Date | null = null;
 
     allWithNextDates.forEach(({ birthday, nextBday }) => {
-      const daysUntil = differenceInDays(nextBday, today);
-      if (isThisWeek(nextBday)) thisWeek.push(birthday);
-      else if (isThisMonth(nextBday)) thisMonth.push(birthday);
-      else if (daysUntil <= 180) next6Months.push(birthday);
-      else rest.push(birthday);
+      if (!upcomingDate) {
+        upcomingDate = nextBday;
+      }
+
+      if (nextBday.getTime() === upcomingDate.getTime()) {
+        upcoming.push(birthday);
+      } else if (isThisWeek(nextBday, { weekStartsOn: 1 })) {
+        thisWeek.push(birthday);
+      } else if (isThisMonth(nextBday)) {
+        thisMonth.push(birthday);
+      } else if (differenceInDays(nextBday, today) <= 180) {
+        next6Months.push(birthday);
+      } else {
+        rest.push(birthday);
+      }
     });
 
     return { upcoming, thisWeek, thisMonth, next6Months, rest };
   };
 
-  const { upcoming, thisWeek, thisMonth, next6Months, rest } = groupBirthdays(birthdays);
-
   const buildFlatListData = (): ListItem[] => {
+    const { upcoming, thisWeek, thisMonth, next6Months, rest } = groupBirthdays(birthdays);
+
     const sections: [string, Birthday[]][] = [
       ['Upcoming', upcoming],
       ['This Week', thisWeek],
@@ -185,9 +195,9 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
   const flatListData = buildFlatListData();
 
-  const renderBirthdayCard = (birthday: Birthday, isFirstUpcoming = false) => {
+  const renderBirthdayCard = (birthday: Birthday, isUpcoming: boolean) => {
     const daysText = getDaysUntilBirthday(birthday.date);
-    const colors = getCardColors(daysText, isFirstUpcoming);
+    const colors = getCardColors(daysText, isUpcoming);
 
     return (
       <TouchableOpacity
@@ -202,11 +212,11 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.cardContent}>
-              <Image
-                source={{ uri: birthday.avatar }}
-                style={styles.avatarImage}
-                resizeMode='contain'
-              />
+            <Image
+              source={{ uri: birthday.avatar }}
+              style={styles.avatarImage}
+              resizeMode="contain"
+            />
             <View style={styles.details}>
               <Text style={styles.name} numberOfLines={1}>
                 {birthday.name}
@@ -215,15 +225,13 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
             </View>
             <View style={styles.ageContainer}>
               <Text style={styles.ageText}>{getNextAge(birthday.date)}</Text>
-              <Text style={styles.daysSubtext}>
-                {daysText.replace('!', '')}
-              </Text>
+              <Text style={styles.daysSubtext}>{daysText.replace('!', '')}</Text>
             </View>
           </View>
 
-          {isFirstUpcoming && (
+          {isUpcoming && (
             <LottieView
-              source={require('../assets/animations/confetti.json')}
+              source={require('../assets/animations/confettinew.json')}
               autoPlay
               loop
               style={styles.confettiAnimation}
@@ -262,18 +270,11 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           keyExtractor={(item, index) =>
             item.type === 'header' ? `header-${item.title}` : item.birthday.id
           }
-          renderItem={({ item, index }) =>
+          renderItem={({ item }) =>
             item.type === 'header' ? (
               <Text style={styles.sectionTitle}>{item.title}</Text>
             ) : (
-              renderBirthdayCard(
-                item.birthday,
-                index > 0 &&
-                  flatListData[0].type === 'header' &&
-                  flatListData[0].title === 'Upcoming' &&
-                  flatListData[1].type === 'item' &&
-                  flatListData[1].birthday.id === item.birthday.id
-              )
+              renderBirthdayCard(item.birthday, upcomingBirthdayIds.has(item.birthday.id))
             )
           }
           contentContainerStyle={styles.list}

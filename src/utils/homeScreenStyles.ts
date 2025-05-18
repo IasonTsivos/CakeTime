@@ -189,10 +189,11 @@ avatarImage: {
   },
   confettiAnimation: {
     position: 'absolute',
-    top: -20,
+    top: -50,
     right: 0,
-    width: 100,
-    height: 100,
+    left: 40,
+    width: CARD_WIDTH + 100, // Increase width
+    height: 150,             // Increase height
     zIndex: 1,
   },
 });

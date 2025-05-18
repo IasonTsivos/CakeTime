@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   Dimensions,
   Platform,
   KeyboardAvoidingView,
+  Image as RNImage,
+  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import uuid from 'react-native-uuid';
@@ -20,27 +22,21 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { format } from 'date-fns';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useLayoutEffect } from 'react';
-import HomeScreen from './HomeScreen';
-import { useFocusEffect } from '@react-navigation/native';
 import AnimatedLottieView from 'lottie-react-native';
-import { Image, Image as RNImage } from 'react-native';
 
-
+import * as Notifications from 'expo-notifications';
 
 const { width } = Dimensions.get('window');
-
 
 export default function AddBirthdayScreen() {
   const navigation = useNavigation();
 
   const [name, setName] = useState('');
   const [birthday, setBirthday] = useState(new Date());
-  const [tempDate, setTempDate] = useState(new Date()); 
+  const [tempDate, setTempDate] = useState(new Date());
   const [avatar, setAvatar] = useState<string>(
-  RNImage.resolveAssetSource(require('../assets/boyhat.png')).uri
-);
-
+    RNImage.resolveAssetSource(require('../assets/boyhat.png')).uri
+  );
   const [wish, setWish] = useState('');
   const [giftIdeas, setGiftIdeas] = useState('');
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -55,6 +51,39 @@ export default function AddBirthdayScreen() {
       ),
     });
   }, [navigation]);
+
+  async function scheduleBirthdayNotification(birthdayDate: Date, friendName: string) {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Enable notifications to get birthday reminders.');
+      return;
+    }
+
+    const now = new Date();
+    const triggerDate = new Date(birthdayDate);
+    triggerDate.setFullYear(now.getFullYear());
+
+    if (triggerDate < now) {
+      triggerDate.setFullYear(triggerDate.getFullYear() + 1);
+    }
+
+    await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "🎉 Birthday Reminder!",
+          body: `Today is ${friendName}'s birthday! Don't forget to send your wishes!`,
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+        },
+        trigger: {
+          hour: 20,
+          minute: 46,
+          repeats: true,
+          channelId: 'birthday-reminders', // optional but recommended
+          day: triggerDate.getDate(),
+          month: triggerDate.getMonth() + 1,
+        },
+      });
+  }
 
   const handleAddBirthday = async () => {
     if (!name) {
@@ -73,6 +102,8 @@ export default function AddBirthdayScreen() {
 
     try {
       await saveBirthday(newBirthday);
+      await scheduleBirthdayNotification(birthday, name);
+      navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'There was a problem saving the birthday.');
     }
@@ -89,148 +120,139 @@ export default function AddBirthdayScreen() {
   };
 
   return (
-  <View style={styles.container}>
-    <AnimatedLottieView
-      source={require('../assets/animations/bg-animation.json')}
-      autoPlay
-      loop
-      style={styles.backgroundAnimation}
-    />
+    <View style={styles.container}>
+      <AnimatedLottieView
+        source={require('../assets/animations/bg-animation.json')}
+        autoPlay
+        loop
+        style={styles.backgroundAnimation}
+      />
 
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust if needed
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
       >
-        <TouchableOpacity
-          style={styles.avatarCircle}
-          onPress={() => setShowAvatarPicker(true)}
-          activeOpacity={0.8}
-        >
-          <Image source={{ uri: avatar }} style={styles.avatarImage} resizeMode="contain" />
-          <View style={styles.editAvatarBadge}>
-            <MaterialIcons name="edit" size={16} color="white" />
-          </View>
-        </TouchableOpacity>
-
-        <AvatarPicker
-          visible={showAvatarPicker}
-          onClose={() => setShowAvatarPicker(false)}
-          onSelect={(selectedAvatar: any) => {
-            const uri = RNImage.resolveAssetSource(selectedAvatar).uri;
-            setAvatar(uri);
-          }}
-        />
-
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Name</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Who's birthday is it?"
-              placeholderTextColor="#999"
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Birthday</Text>
-            <TouchableOpacity
-              onPress={() => {
-                setTempDate(birthday);
-                setDatePickerVisible(true);
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.input}>
-                <Text style={styles.inputText}>
-                  {format(birthday, 'MMMM do, yyyy')}
-                </Text>
-                <MaterialIcons name="calendar-today" size={20} color="#ff6b81" />
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {isDatePickerVisible && (
-            <>
-              <DateTimePicker
-                value={tempDate}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleDateChange}
-              />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10 }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setBirthday(tempDate);
-                    setDatePickerVisible(false);
-                  }}
-                  style={{ padding: 10, backgroundColor: '#ff6b81', borderRadius: 8 }}
-                >
-                  <Text style={{ color: 'white', fontWeight: 'bold' }}>Confirm</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setDatePickerVisible(false)}
-                  style={{ padding: 10, backgroundColor: '#ccc', borderRadius: 8 }}
-                >
-                  <Text style={{ color: 'black' }}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Birthday Wish (Optional)</Text>
-            <TextInput
-              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-              placeholder="Write a pre-made birthday message..."
-              placeholderTextColor="#999"
-              value={wish}
-              onChangeText={setWish}
-              multiline
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Gift Ideas (Optional)</Text>
-            <TextInput
-              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-              placeholder="Book, Perfume, Concert tickets..."
-              placeholderTextColor="#999"
-              value={giftIdeas}
-              onChangeText={setGiftIdeas}
-              multiline
-            />
-          </View>
-
+        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <TouchableOpacity
-            style={styles.button}
-            onPress={handleAddBirthday}
+            style={styles.avatarCircle}
+            onPress={() => setShowAvatarPicker(true)}
             activeOpacity={0.8}
           >
-            <LinearGradient
-              colors={['#ff8a9b', '#ff6b81']}
-              style={styles.buttonGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.buttonText}>Save Birthday</Text>
-              <MaterialIcons name="celebration" size={20} color="white" />
-            </LinearGradient>
+            <Image source={{ uri: avatar }} style={styles.avatarImage} resizeMode="contain" />
+            <View style={styles.editAvatarBadge}>
+              <MaterialIcons name="edit" size={16} color="white" />
+            </View>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  </View>
-);
 
+          <AvatarPicker
+            visible={showAvatarPicker}
+            onClose={() => setShowAvatarPicker(false)}
+            onSelect={(selectedAvatar: any) => {
+              const uri = RNImage.resolveAssetSource(selectedAvatar).uri;
+              setAvatar(uri);
+            }}
+          />
+
+          <View style={styles.formContainer}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Who's birthday is it?"
+                placeholderTextColor="#999"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Birthday</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setTempDate(birthday);
+                  setDatePickerVisible(true);
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={styles.input}>
+                  <Text style={styles.inputText}>{format(birthday, 'MMMM do, yyyy')}</Text>
+                  <MaterialIcons name="calendar-today" size={20} color="#ff6b81" />
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {isDatePickerVisible && (
+              <>
+                <DateTimePicker
+                  value={tempDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleDateChange}
+                />
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10 }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setBirthday(tempDate);
+                      setDatePickerVisible(false);
+                    }}
+                    style={{ padding: 10, backgroundColor: '#ff6b81', borderRadius: 8 }}
+                  >
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Confirm</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setDatePickerVisible(false)}
+                    style={{ padding: 10, backgroundColor: '#ccc', borderRadius: 8 }}
+                  >
+                    <Text style={{ color: 'black' }}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Birthday Wish (Optional)</Text>
+              <TextInput
+                style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+                placeholder="Write a pre-made birthday message..."
+                placeholderTextColor="#999"
+                value={wish}
+                onChangeText={setWish}
+                multiline
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Gift Ideas (Optional)</Text>
+              <TextInput
+                style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+                placeholder="Book, Perfume, Concert tickets..."
+                placeholderTextColor="#999"
+                value={giftIdeas}
+                onChangeText={setGiftIdeas}
+                multiline
+              />
+            </View>
+
+            <TouchableOpacity style={styles.button} onPress={handleAddBirthday} activeOpacity={0.8}>
+              <LinearGradient
+                colors={['#ff8a9b', '#ff6b81']}
+                style={styles.buttonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.buttonText}>Save Birthday</Text>
+                <MaterialIcons name="celebration" size={20} color="white" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
+  );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -258,9 +280,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
-  },
-  avatarTextBig: {
-    fontSize: 60,
   },
   editAvatarBadge: {
     position: 'absolute',
@@ -346,9 +365,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   avatarImage: {
-  width: 100,
-  height: 100,
-  borderRadius: 40,
-},
-
+    width: 100,
+    height: 100,
+    borderRadius: 40,
+  },
 });
