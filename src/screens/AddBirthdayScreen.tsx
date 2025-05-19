@@ -60,12 +60,13 @@ export default function AddBirthdayScreen() {
   }
 
   const now = new Date();
-  const triggerDate = new Date(birthdayDate);
-  triggerDate.setFullYear(now.getFullYear());
+  const currentYear = now.getFullYear();
 
-  // If the birthday has already passed this year, schedule it for next year
-  if (triggerDate < now) {
-    triggerDate.setFullYear(triggerDate.getFullYear() + 1);
+  // --- Birthday Notification ---
+  const birthdayThisYear = new Date(birthdayDate);
+  birthdayThisYear.setFullYear(currentYear);
+  if (birthdayThisYear < now) {
+    birthdayThisYear.setFullYear(currentYear + 1);
   }
 
   await Notifications.scheduleNotificationAsync({
@@ -76,12 +77,32 @@ export default function AddBirthdayScreen() {
       priority: Notifications.AndroidNotificationPriority.HIGH,
     },
     trigger: {
-      // Proper calendar-based trigger with repeat
       type: 'calendar',
-      month: triggerDate.getMonth() + 1, // Months are 1-based in this API
-      day: triggerDate.getDate(),
-      hour: 9,
-      minute: 0,
+      month: birthdayThisYear.getMonth() + 1,
+      day: birthdayThisYear.getDate(),
+      hour: 16,
+      minute: 35,
+      repeats: true,
+    },
+  });
+
+  // --- Day-Before Reminder Notification ---
+  const dayBefore = new Date(birthdayThisYear);
+  dayBefore.setDate(dayBefore.getDate() - 1);
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "⏰ Heads-Up!",
+      body: `Tomorrow is ${friendName}'s birthday. Get your message and gift ready!`,
+      sound: true,
+      priority: Notifications.AndroidNotificationPriority.HIGH,
+    },
+    trigger: {
+      type: 'calendar',
+      month: dayBefore.getMonth() + 1,
+      day: dayBefore.getDate(),
+      hour: 16,
+      minute: 32,
       repeats: true,
     },
   });
