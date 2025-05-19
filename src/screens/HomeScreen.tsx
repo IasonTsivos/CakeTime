@@ -30,6 +30,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import homescreenstyles from '../styles/homeScreenStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { requestNotificationPermission } from '../utils/requestNotification';
+import { useTheme } from '../utils/ThemeContext'; 
+
 
 const { width } = Dimensions.get('window');
 
@@ -77,9 +79,11 @@ const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
   if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
   if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
   return ['#FFFDD0', '#FEDEB8'];
+  
 };
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
+  const { theme } = useTheme();
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [upcomingBirthdayIds, setUpcomingBirthdayIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -169,7 +173,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
     return { upcoming, thisWeek, thisMonth, next6Months, rest };
   };
-
+  
   const buildFlatListData = (): ListItem[] => {
     const { upcoming, thisWeek, thisMonth, next6Months, rest } = groupBirthdays(birthdays);
 
@@ -245,19 +249,19 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   return (
     <View style={[styles.container, { paddingTop: insets.top - 30 }]}>
       <LottieView
-        source={require('../assets/animations/bg-animation.json')}
+        source={theme.animation} 
         autoPlay
         loop
         style={styles.backgroundAnimation}
       />
       <View style={styles.header}>
         <Text style={styles.heading}>Birthday Reminders</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('AddBirthday')}
-        >
-          <MaterialIcons name="add" size={28} color="white" />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: theme.primary }]}
+            onPress={() => navigation.navigate('AddBirthday')}
+          >
+            <MaterialIcons name="add" size={28} color="white" />
+          </TouchableOpacity>
       </View>
 
       {birthdays.length === 0 ? (
@@ -281,7 +285,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         />
       )}
       <TouchableOpacity
-        style={styles.settingsButton}
+        style={[styles.settingsButton, { backgroundColor: theme.primary }]}
         onPress={() => navigation.navigate('Settings')}
       >
         <MaterialIcons name="settings" size={28} color="white" />

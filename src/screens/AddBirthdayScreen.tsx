@@ -25,11 +25,13 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AnimatedLottieView from 'lottie-react-native';
 import birthdaystyles from '../styles/birthdayStyles';
 import { scheduleBirthdayNotifications } from '../utils/notifications';
+import { useTheme } from '../utils/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 export default function AddBirthdayScreen() {
   const navigation = useNavigation();
+  const { theme } = useTheme();
 
   const [name, setName] = useState('');
   const [birthday, setBirthday] = useState(new Date());
@@ -73,7 +75,7 @@ export default function AddBirthdayScreen() {
         date: birthday.toISOString(),
         avatar,
         wish,
-        giftIdeas: giftIdeaList.join('|'), // <-- Fix applied here
+        giftIdeas: giftIdeaList.join('|'),
         notificationIds,
       };
 
@@ -97,7 +99,7 @@ export default function AddBirthdayScreen() {
   return (
     <View style={styles.container}>
       <AnimatedLottieView
-        source={require('../assets/animations/bg-animation.json')}
+        source={theme.animation}
         autoPlay
         loop
         style={styles.backgroundAnimation}
@@ -115,7 +117,7 @@ export default function AddBirthdayScreen() {
             activeOpacity={0.8}
           >
             <Image source={{ uri: avatar }} style={styles.avatarImage} resizeMode="contain" />
-            <View style={styles.editAvatarBadge}>
+            <View style={[styles.editAvatarBadge, { backgroundColor: theme.primary }]}>
               <MaterialIcons name="edit" size={16} color="white" />
             </View>
           </TouchableOpacity>
@@ -153,7 +155,7 @@ export default function AddBirthdayScreen() {
               >
                 <View style={styles.input}>
                   <Text style={styles.inputText}>{format(birthday, 'MMMM do, yyyy')}</Text>
-                  <MaterialIcons name="calendar-today" size={20} color="#ff6b81" />
+                  <MaterialIcons name="calendar-today" size={20} color={theme.primary} />
                 </View>
               </TouchableOpacity>
             </View>
@@ -172,7 +174,7 @@ export default function AddBirthdayScreen() {
                       setBirthday(tempDate);
                       setDatePickerVisible(false);
                     }}
-                    style={{ padding: 10, backgroundColor: '#ff6b81', borderRadius: 8 }}
+                    style={{ padding: 10, backgroundColor: theme.primary, borderRadius: 8 }}
                   >
                     <Text style={{ color: 'white', fontWeight: 'bold' }}>Confirm</Text>
                   </TouchableOpacity>
@@ -217,7 +219,7 @@ export default function AddBirthdayScreen() {
                   blurOnSubmit={false}
                 />
                 <TouchableOpacity
-                  style={styles.addGiftButton}
+                  style={[styles.addGiftButton, { backgroundColor: theme.primary }]}
                   onPress={() => {
                     if (giftIdeaInput.trim()) {
                       setGiftIdeaList([...giftIdeaList, giftIdeaInput.trim()]);
@@ -225,13 +227,13 @@ export default function AddBirthdayScreen() {
                     }
                   }}
                 >
-                  <MaterialIcons name="add" size={28} color="#ff6b81" />
+                  <MaterialIcons name="add" size={28} color="#fff" />
                 </TouchableOpacity>
               </View>
 
               <View style={styles.giftIdeaBubblesContainer}>
                 {giftIdeaList.map((idea, index) => (
-                  <View key={index} style={styles.giftIdeaBubble}>
+                  <View key={index} style={[styles.giftIdeaBubble, { backgroundColor: theme.shadow }]}>
                     <Text style={styles.giftIdeaText}>{idea}</Text>
                     <TouchableOpacity
                       onPress={() => {
@@ -248,7 +250,7 @@ export default function AddBirthdayScreen() {
 
             <TouchableOpacity style={styles.button} onPress={handleAddBirthday} activeOpacity={0.8}>
               <LinearGradient
-                colors={['#ff8a9b', '#ff6b81']}
+                colors={[theme.shadow, theme.primary]}
                 style={styles.buttonGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}

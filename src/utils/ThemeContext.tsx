@@ -13,8 +13,14 @@ const THEMES = {
     name: 'green',
     primary: '#51ff63',
     shadow: '#32cc4c',
-    animation: require('../assets/animations/bg-animation.json'),
+    animation: require('../assets/animations/newbg.json'),
   },
+    blue: {
+        name: 'blue',
+        primary: '#51daff',
+        shadow: '#007aff',
+        animation: require('../assets/animations/newbg.json'),
+    },
 };
 
 type ThemeKey = keyof typeof THEMES;

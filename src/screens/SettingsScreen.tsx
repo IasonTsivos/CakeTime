@@ -25,7 +25,7 @@ type SettingsScreenProps = {
   navigation: SettingsScreenNavigationProp;
 };
 
-const THEME_KEYS = ['pink', 'green'] as const;
+const THEME_KEYS = ['pink', 'green' , 'blue'] as const;
 type ThemeKey = typeof THEME_KEYS[number];
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
@@ -85,7 +85,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               style={[
                 styles.colorCircle,
                 {
-                  backgroundColor: key === 'pink' ? '#ff8eec' : '#51ff63',
+                  backgroundColor: 
+                    key === 'pink' ? '#ff8eec' :
+                    key === 'green' ? '#51ff63' :
+                    '#51daff',  // blue
                 },
                 selectedKey === key && styles.selectedColorCircle,
               ]}
