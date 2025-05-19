@@ -24,6 +24,8 @@ import { deleteBirthday, updateBirthday } from '../utils/storage';
 import AnimatedLottieView from 'lottie-react-native';
 import { RootStackParamList } from '../types/navigation';
 import { Image } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import birthdaystyles from '../styles/birthdayStyles';
 
 const { width } = Dimensions.get('window');
 
@@ -76,22 +78,34 @@ export default function EditBirthdayScreen() {
   };
 
   const handleDelete = () => {
-    Alert.alert('Delete Birthday', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteBirthday(birthday.id);
-            navigation.navigate('Home', { refresh: true });
-          } catch (e) {
-            Alert.alert('Error', 'Could not delete birthday');
+  Alert.alert('Delete Birthday', 'Are you sure?', [
+    { text: 'Cancel', style: 'cancel' },
+    {
+      text: 'Delete',
+      style: 'destructive',
+      onPress: async () => {
+        try {
+          // Cancel scheduled notifications if they exist
+          if (birthday.notificationIds) {
+            if (birthday.notificationIds.birthday) {
+              await Notifications.cancelScheduledNotificationAsync(birthday.notificationIds.birthday);
+            }
+            if (birthday.notificationIds.headsUp) {
+              await Notifications.cancelScheduledNotificationAsync(birthday.notificationIds.headsUp);
+            }
           }
-        },
+
+          // Delete birthday from storage
+          await deleteBirthday(birthday.id);
+
+          navigation.navigate('Home', { refresh: true });
+        } catch (e) {
+          Alert.alert('Error', 'Could not delete birthday');
+        }
       },
-    ]);
-  };
+    },
+  ]);
+};
 
   return (
   <View style={styles.container}>

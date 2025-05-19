@@ -23,8 +23,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { format } from 'date-fns';
 import { MaterialIcons } from '@expo/vector-icons';
 import AnimatedLottieView from 'lottie-react-native';
-
-import * as Notifications from 'expo-notifications';
+import birthdaystyles from '../styles/birthdayStyles';
+import { scheduleBirthdayNotifications } from '../utils/notifications';
 
 const { width } = Dimensions.get('window');
 
@@ -52,81 +52,31 @@ export default function AddBirthdayScreen() {
     });
   }, [navigation]);
 
-  async function scheduleBirthdayNotification(birthdayDate: Date, friendName: string) {
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== 'granted') {
-    Alert.alert('Permission required', 'Enable notifications to get birthday reminders.');
-    return;
-  }
-
-  const now = new Date();
-  const currentYear = now.getFullYear();
-
-  // --- Birthday Notification ---
-  const birthdayThisYear = new Date(birthdayDate);
-  birthdayThisYear.setFullYear(currentYear);
-  if (birthdayThisYear < now) {
-    birthdayThisYear.setFullYear(currentYear + 1);
-  }
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "🎉 Birthday Reminder!",
-      body: `Today is ${friendName}'s birthday! Don't forget to send your wishes!`,
-      sound: true,
-      priority: Notifications.AndroidNotificationPriority.HIGH,
-    },
-    trigger: {
-      type: 'calendar',
-      month: birthdayThisYear.getMonth() + 1,
-      day: birthdayThisYear.getDate(),
-      hour: 16,
-      minute: 35,
-      repeats: true,
-    },
-  });
-
-  // --- Day-Before Reminder Notification ---
-  const dayBefore = new Date(birthdayThisYear);
-  dayBefore.setDate(dayBefore.getDate() - 1);
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "⏰ Heads-Up!",
-      body: `Tomorrow is ${friendName}'s birthday. Get your message and gift ready!`,
-      sound: true,
-      priority: Notifications.AndroidNotificationPriority.HIGH,
-    },
-    trigger: {
-      type: 'calendar',
-      month: dayBefore.getMonth() + 1,
-      day: dayBefore.getDate(),
-      hour: 16,
-      minute: 32,
-      repeats: true,
-    },
-  });
-}
-
-
   const handleAddBirthday = async () => {
     if (!name) {
       Alert.alert('Oops!', 'Please enter a name for this birthday.');
       return;
     }
 
-    const newBirthday: Birthday = {
-      id: uuid.v4().toString(),
-      name,
-      date: birthday.toISOString(),
-      avatar,
-      wish,
-      giftIdeas,
-    };
-
     try {
+      const notificationIds = await scheduleBirthdayNotifications(name, birthday);
+
+      if (!notificationIds.birthday || !notificationIds.headsUp) {
+        Alert.alert('Error', 'Failed to schedule notifications properly.');
+        return;
+      }
+
+      const newBirthday: Birthday = {
+        id: uuid.v4().toString(),
+        name,
+        date: birthday.toISOString(),
+        avatar,
+        wish,
+        giftIdeas,
+        notificationIds,
+      };
+
       await saveBirthday(newBirthday);
-      await scheduleBirthdayNotification(birthday, name);
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'There was a problem saving the birthday.');
@@ -278,119 +228,5 @@ export default function AddBirthdayScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-  },
-  scrollContainer: {
-    paddingBottom: 40,
-  },
-  avatarCircle: {
-    alignSelf: 'center',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-    borderWidth: 3,
-    borderColor: '#ff6b81',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  editAvatarBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#ff6b81',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  formContainer: {
-    paddingHorizontal: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#555',
-  },
-  input: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#eee',
-    fontSize: 16,
-    color: '#333',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  inputText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  backgroundAnimation: {
-    position: 'absolute',
-    width,
-    height: Dimensions.get('window').height,
-    top: 0,
-    left: 0,
-    zIndex: -1,
-    opacity: 0.4,
-  },
-  button: {
-    marginTop: 30,
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#ff6b81',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  buttonGradient: {
-    padding: 18,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-    marginRight: 10,
-  },
-  avatarImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 40,
-  },
+  ...birthdaystyles,
 });

@@ -27,7 +27,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
-import homescreenstyles from '../utils/homeScreenStyles';
+import homescreenstyles from '../styles/homeScreenStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { requestNotificationPermission } from '../utils/requestNotification';
 
@@ -174,7 +174,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     const { upcoming, thisWeek, thisMonth, next6Months, rest } = groupBirthdays(birthdays);
 
     const sections: [string, Birthday[]][] = [
-      ['Upcoming', upcoming],
+      ['Coming soon...', upcoming],
       ['This Week', thisWeek],
       ['This Month', thisMonth],
       ['Next 6 Months', next6Months],
