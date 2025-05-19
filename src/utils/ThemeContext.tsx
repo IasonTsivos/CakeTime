@@ -19,7 +19,7 @@ const THEMES = {
         name: 'blue',
         primary: '#51daff',
         shadow: '#007aff',
-        animation: require('../assets/animations/newbg.json'),
+        animation: require('../assets/animations/bgblue.json'),
     },
 };
 

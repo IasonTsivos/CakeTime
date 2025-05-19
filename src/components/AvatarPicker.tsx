@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     height: avatarSize * 0.8,
   },
   closeButton: {
-    backgroundColor: '#ff6b81',
+    backgroundColor: '#404040',
     padding: 12,
     borderRadius: 10,
     marginTop: 10,
