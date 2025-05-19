@@ -62,7 +62,7 @@ const getNextAge = (dateString: string) => {
   ) {
     age--;
   }
-  return age + 1;
+  return age ;
 };
 
 const getCardColors = (

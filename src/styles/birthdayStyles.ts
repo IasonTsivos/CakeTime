@@ -120,6 +120,60 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 40,
   },
+  giftIdeaInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  giftIdeaInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eee',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+  },
+  addGiftButton: {
+    marginLeft: 10,
+    backgroundColor: '#ffe6eb',
+    borderRadius: 12,
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#ff6b81',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  giftIdeaBubblesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  giftIdeaBubble: {
+    flexDirection: 'row',
+    backgroundColor: '#ff6b81',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  giftIdeaText: {
+    color: 'white',
+    fontSize: 14,
+  },
+  giftIdeaRemoveButton: {
+    marginLeft: 6,
+    backgroundColor: '#ff4757',
+    borderRadius: 10,
+    padding: 2,
+  },
+
 });
 
 export default styles;

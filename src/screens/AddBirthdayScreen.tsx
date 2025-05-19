@@ -38,7 +38,8 @@ export default function AddBirthdayScreen() {
     RNImage.resolveAssetSource(require('../assets/boyhat.png')).uri
   );
   const [wish, setWish] = useState('');
-  const [giftIdeas, setGiftIdeas] = useState('');
+  const [giftIdeaInput, setGiftIdeaInput] = useState('');
+  const [giftIdeaList, setGiftIdeaList] = useState<string[]>([]);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
@@ -72,7 +73,7 @@ export default function AddBirthdayScreen() {
         date: birthday.toISOString(),
         avatar,
         wish,
-        giftIdeas,
+        giftIdeas: giftIdeaList.join('|'), // <-- Fix applied here
         notificationIds,
       };
 
@@ -199,14 +200,50 @@ export default function AddBirthdayScreen() {
 
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Gift Ideas (Optional)</Text>
-              <TextInput
-                style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-                placeholder="Book, Perfume, Concert tickets..."
-                placeholderTextColor="#999"
-                value={giftIdeas}
-                onChangeText={setGiftIdeas}
-                multiline
-              />
+              <View style={styles.giftIdeaInputRow}>
+                <TextInput
+                  style={styles.giftIdeaInput}
+                  placeholder="Add a gift idea"
+                  placeholderTextColor="#999"
+                  value={giftIdeaInput}
+                  onChangeText={setGiftIdeaInput}
+                  onSubmitEditing={() => {
+                    if (giftIdeaInput.trim()) {
+                      setGiftIdeaList([...giftIdeaList, giftIdeaInput.trim()]);
+                      setGiftIdeaInput('');
+                    }
+                  }}
+                  returnKeyType="done"
+                  blurOnSubmit={false}
+                />
+                <TouchableOpacity
+                  style={styles.addGiftButton}
+                  onPress={() => {
+                    if (giftIdeaInput.trim()) {
+                      setGiftIdeaList([...giftIdeaList, giftIdeaInput.trim()]);
+                      setGiftIdeaInput('');
+                    }
+                  }}
+                >
+                  <MaterialIcons name="add" size={28} color="#ff6b81" />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.giftIdeaBubblesContainer}>
+                {giftIdeaList.map((idea, index) => (
+                  <View key={index} style={styles.giftIdeaBubble}>
+                    <Text style={styles.giftIdeaText}>{idea}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setGiftIdeaList(giftIdeaList.filter((_, i) => i !== index));
+                      }}
+                      style={styles.giftIdeaRemoveButton}
+                    >
+                      <MaterialIcons name="close" size={16} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
             </View>
 
             <TouchableOpacity style={styles.button} onPress={handleAddBirthday} activeOpacity={0.8}>
