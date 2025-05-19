@@ -7,6 +7,7 @@ import HomeTabs from './src/navigation/HomeStackNavigator';
 import IntroSlider from './src/screens/IntroSlider';
 import { ActivityIndicator, View } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import { ThemeProvider } from './src/utils/ThemeContext'; // 👈 import ThemeProvider
 
 // ✅ GLOBAL: Set up how notifications behave when app is foreground
 Notifications.setNotificationHandler({
@@ -14,7 +15,7 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
-    shouldShowBanner: true, // ✅ required in newer versions
+    shouldShowBanner: true,
     shouldShowList: true
   }),
 });
@@ -47,12 +48,14 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName={initialRoute}>
-        <Stack.Screen name="Intro" component={IntroSlider} options={{ headerShown: false }} />
-        <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider> 
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName={initialRoute}>
+          <Stack.Screen name="Intro" component={IntroSlider} options={{ headerShown: false }} />
+          <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 };
 

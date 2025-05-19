@@ -1,8 +1,10 @@
 import { StyleSheet, Platform } from 'react-native';
 import { Dimensions } from 'react-native';
+import { THEME, THEME_SHADOW } from './theme';
 
 const { width,height } = Dimensions.get('window');
 const CARD_WIDTH = width - 40;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -29,13 +31,13 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Avenir Next' : 'sans-serif-condensed',
   },
   addButton: {
-    backgroundColor: '#ff8eec',
+    backgroundColor: THEME,
     width: 50,
     height: 50,
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#ff6b81',
+    shadowColor: THEME_SHADOW,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -66,14 +68,14 @@ const styles = StyleSheet.create({
   position: 'absolute',
   bottom: 30, // adjust for safe area if needed
   right: 20,
-  backgroundColor: '#ff8eec', // pink to match theme, adjust as you like
+  backgroundColor: THEME, // pink to match theme, adjust as you like
   width: 56,
   height: 56,
   borderRadius: 28,
   justifyContent: 'center',
   alignItems: 'center',
   elevation: 5, // for shadow on Android
-  shadowColor: '#000', // iOS shadow
+  shadowColor: THEME_SHADOW, // iOS shadow
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.3,
   shadowRadius: 3,
