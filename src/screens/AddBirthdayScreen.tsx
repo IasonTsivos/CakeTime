@@ -53,37 +53,40 @@ export default function AddBirthdayScreen() {
   }, [navigation]);
 
   async function scheduleBirthdayNotification(birthdayDate: Date, friendName: string) {
-    const { status } = await Notifications.requestPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission required', 'Enable notifications to get birthday reminders.');
-      return;
-    }
-
-    const now = new Date();
-    const triggerDate = new Date(birthdayDate);
-    triggerDate.setFullYear(now.getFullYear());
-
-    if (triggerDate < now) {
-      triggerDate.setFullYear(triggerDate.getFullYear() + 1);
-    }
-
-    await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "🎉 Birthday Reminder!",
-          body: `Today is ${friendName}'s birthday! Don't forget to send your wishes!`,
-          sound: true,
-          priority: Notifications.AndroidNotificationPriority.HIGH,
-        },
-        trigger: {
-          hour: 20,
-          minute: 46,
-          repeats: true,
-          channelId: 'birthday-reminders', // optional but recommended
-          day: triggerDate.getDate(),
-          month: triggerDate.getMonth() + 1,
-        },
-      });
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== 'granted') {
+    Alert.alert('Permission required', 'Enable notifications to get birthday reminders.');
+    return;
   }
+
+  const now = new Date();
+  const triggerDate = new Date(birthdayDate);
+  triggerDate.setFullYear(now.getFullYear());
+
+  // If the birthday has already passed this year, schedule it for next year
+  if (triggerDate < now) {
+    triggerDate.setFullYear(triggerDate.getFullYear() + 1);
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "🎉 Birthday Reminder!",
+      body: `Today is ${friendName}'s birthday! Don't forget to send your wishes!`,
+      sound: true,
+      priority: Notifications.AndroidNotificationPriority.HIGH,
+    },
+    trigger: {
+      // Proper calendar-based trigger with repeat
+      type: 'calendar',
+      month: triggerDate.getMonth() + 1, // Months are 1-based in this API
+      day: triggerDate.getDate(),
+      hour: 9,
+      minute: 0,
+      repeats: true,
+    },
+  });
+}
+
 
   const handleAddBirthday = async () => {
     if (!name) {
