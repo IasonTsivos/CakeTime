@@ -154,7 +154,7 @@ export default function EditBirthdayScreen() {
               placeholderTextColor="#999"
             />
 
-            <Text style={birthdaystyles.label}>Birthday</Text>
+            <Text style={birthdaystyles.label1}>Birthday</Text>
             <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
               <View style={birthdaystyles.input}>
                 <Text style={birthdaystyles.inputText}>{format(date, 'MMMM do, yyyy')}</Text>
@@ -173,7 +173,7 @@ export default function EditBirthdayScreen() {
               />
             )}
 
-            <Text style={birthdaystyles.label}>Wish</Text>
+            <Text style={birthdaystyles.label1}>Wish</Text>
             <TextInput
               style={[birthdaystyles.input, { height: 100, textAlignVertical: 'top' }]}
               value={wish}
@@ -183,7 +183,7 @@ export default function EditBirthdayScreen() {
               placeholderTextColor="#999"
             />
 
-            <Text style={birthdaystyles.label}>Gift Ideas</Text>
+            <Text style={birthdaystyles.label1}>Gift Ideas</Text>
 
             <View style={birthdaystyles.giftIdeaInputRow}>
               <TextInput

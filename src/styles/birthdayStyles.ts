@@ -46,12 +46,19 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
   },
   formContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 40,
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#555',
+  },
+  label1: {
+    marginTop: 20,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
