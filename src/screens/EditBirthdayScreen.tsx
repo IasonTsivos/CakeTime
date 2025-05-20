@@ -25,6 +25,7 @@ import AnimatedLottieView from 'lottie-react-native';
 import { RootStackParamList } from '../types/navigation';
 import * as Notifications from 'expo-notifications';
 import birthdaystyles from '../styles/birthdayStyles';
+import { useTheme } from '../utils/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -34,6 +35,7 @@ type EditBirthdayRouteProp = RouteProp<RootStackParamList, 'EditBirthday'>;
 export default function EditBirthdayScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { birthday } = useRoute<EditBirthdayRouteProp>().params;
+  const { theme } = useTheme();
 
   const [name, setName] = useState(birthday.name);
   const [date, setDate] = useState(parseISO(birthday.date));
@@ -50,11 +52,11 @@ export default function EditBirthdayScreen() {
     navigation.setOptions({
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 15 }}>
-          <MaterialIcons name="arrow-back" size={24} color="#ff6b81" />
+          <MaterialIcons name="arrow-back" size={24} color={theme.primary} />
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, theme.primary]);
 
   const handleSave = async () => {
     if (!name) {
@@ -109,7 +111,7 @@ export default function EditBirthdayScreen() {
   return (
     <View style={birthdaystyles.container}>
       <AnimatedLottieView
-        source={require('../assets/animations/bg-animation.json')}
+        source={theme.animation}
         autoPlay
         loop
         style={birthdaystyles.backgroundAnimation}
@@ -127,7 +129,7 @@ export default function EditBirthdayScreen() {
             activeOpacity={0.8}
           >
             <Image source={{ uri: avatar }} style={birthdaystyles.avatarImage} resizeMode="contain" />
-            <View style={birthdaystyles.editAvatarBadge}>
+            <View style={[birthdaystyles.editAvatarBadge, { backgroundColor: theme.primary }]}>
               <MaterialIcons name="edit" size={16} color="white" />
             </View>
           </TouchableOpacity>
@@ -149,13 +151,14 @@ export default function EditBirthdayScreen() {
               onChangeText={setName}
               placeholder="Name"
               autoCapitalize="words"
+              placeholderTextColor="#999"
             />
 
             <Text style={birthdaystyles.label}>Birthday</Text>
             <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
               <View style={birthdaystyles.input}>
                 <Text style={birthdaystyles.inputText}>{format(date, 'MMMM do, yyyy')}</Text>
-                <MaterialIcons name="calendar-today" size={20} color="#ff6b81" />
+                <MaterialIcons name="calendar-today" size={20} color={theme.primary} />
               </View>
             </TouchableOpacity>
             {isDatePickerVisible && (
@@ -176,6 +179,8 @@ export default function EditBirthdayScreen() {
               value={wish}
               onChangeText={setWish}
               multiline
+              placeholder="Write a wish..."
+              placeholderTextColor="#999"
             />
 
             <Text style={birthdaystyles.label}>Gift Ideas</Text>
@@ -192,9 +197,10 @@ export default function EditBirthdayScreen() {
                     setNewGiftIdea('');
                   }
                 }}
+                placeholderTextColor="#999"
               />
               <TouchableOpacity
-                style={birthdaystyles.addGiftButton}
+                style={[birthdaystyles.addGiftButton, { backgroundColor: theme.primary }]}
                 onPress={() => {
                   if (newGiftIdea.trim()) {
                     setGiftIdeas([...giftIdeas, newGiftIdea.trim()]);
@@ -202,13 +208,13 @@ export default function EditBirthdayScreen() {
                   }
                 }}
               >
-                <MaterialIcons name="add" size={28} color="#ff6b81" />
+                <MaterialIcons name="add" size={28} color="#fff" />
               </TouchableOpacity>
             </View>
 
             <View style={birthdaystyles.giftIdeaBubblesContainer}>
               {giftIdeas.map((idea, index) => (
-                <View key={index} style={birthdaystyles.giftIdeaBubble}>
+                <View key={index} style={[birthdaystyles.giftIdeaBubble, { backgroundColor: theme.shadow }]}>
                   <Text style={birthdaystyles.giftIdeaText}>{idea}</Text>
                   <TouchableOpacity
                     style={birthdaystyles.giftIdeaRemoveButton}
@@ -223,18 +229,29 @@ export default function EditBirthdayScreen() {
             </View>
 
             <TouchableOpacity style={birthdaystyles.button} onPress={handleSave}>
-              <LinearGradient colors={['#ff8a9b', '#ff6b81']} style={birthdaystyles.buttonGradient}>
+              <LinearGradient
+                colors={[theme.primary, theme.shadow]}
+                style={birthdaystyles.buttonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
                 <Text style={birthdaystyles.buttonText}>Save Changes</Text>
                 <MaterialIcons name="save" size={20} color="white" />
               </LinearGradient>
             </TouchableOpacity>
 
             <TouchableOpacity style={[birthdaystyles.button, { marginTop: 15 }]} onPress={handleDelete}>
-              <LinearGradient colors={['#ff6b81', '#ff4e50']} style={birthdaystyles.buttonGradient}>
+              <LinearGradient
+                colors={['#e74c3c' ,'#c0392b' ]}
+                style={birthdaystyles.buttonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
                 <Text style={birthdaystyles.buttonText}>Delete</Text>
                 <MaterialIcons name="delete" size={20} color="white" />
               </LinearGradient>
             </TouchableOpacity>
+
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

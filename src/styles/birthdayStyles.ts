@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 20,
     borderWidth: 3,
-    borderColor: '#ff6b81',
+    borderColor: '#000000',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -169,7 +169,6 @@ const styles = StyleSheet.create({
   },
   giftIdeaRemoveButton: {
     marginLeft: 6,
-    backgroundColor: '#ff4757',
     borderRadius: 10,
     padding: 2,
   },

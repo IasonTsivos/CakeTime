@@ -57,12 +57,12 @@ birthdayCard: {
   elevation: 5,
   overflow: 'hidden',
 
-  // 👇 Add these lines for black border
   borderWidth: 2,
-  borderColor: 'black',
+  borderColor: '#202020',
 },
+
   gradientBackground: {
-    padding: 20,
+    padding: 15,
   },
   cardContent: {
     flexDirection: 'row',
@@ -187,7 +187,7 @@ avatarImage: {
     marginTop: 8,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700',
     color: '#333',
     marginTop: 20,

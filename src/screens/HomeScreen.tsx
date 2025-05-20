@@ -79,10 +79,8 @@ const getCardColors = (
 };
 
 const getBackgroundColor = (daysText: string): [ColorValue, ColorValue] => {
-  if (daysText === 'Today!') return ['#FF9A9E', '#FAD0C4'];
   if (daysText === 'Tomorrow!') return ['#A1C4FD', '#C2E9FB'];
   return ['#FFFDD0', '#FEDEB8'];
-  
 };
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
@@ -181,11 +179,11 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     const { upcoming, thisWeek, thisMonth, next6Months, rest } = groupBirthdays(birthdays);
 
     const sections: [string, Birthday[]][] = [
-      ['Coming soon...', upcoming],
+      ['Get your 🎁 for', upcoming],
       ['This Week', thisWeek],
       ['This Month', thisMonth],
       ['Next 6 Months', next6Months],
-      ['Rest', rest],
+      ['Later this Year', rest],
     ];
 
     const flatListData: ListItem[] = [];
