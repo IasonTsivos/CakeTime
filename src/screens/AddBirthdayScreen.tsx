@@ -65,6 +65,7 @@ export default function AddBirthdayScreen() {
       const notificationIds = await scheduleBirthdayNotifications(name, birthday);
 
       if (!notificationIds.birthday || !notificationIds.headsUp) {
+        console.error('Failed to save birthday:', Error);
         Alert.alert('Error', 'Failed to schedule notifications properly.');
         return;
       }

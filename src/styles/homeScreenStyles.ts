@@ -46,17 +46,21 @@ const styles = StyleSheet.create({
   list: {
     paddingBottom: 30,
   },
-  birthdayCard: {
-    width: CARD_WIDTH,
-    borderRadius: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-    overflow: 'hidden',
-  },
+birthdayCard: {
+  width: CARD_WIDTH,
+  borderRadius: 20,
+  marginBottom: 20,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.1,
+  shadowRadius: 10,
+  elevation: 5,
+  overflow: 'hidden',
+
+  // 👇 Add these lines for black border
+  borderWidth: 2,
+  borderColor: 'black',
+},
   gradientBackground: {
     padding: 20,
   },
@@ -103,14 +107,14 @@ avatarImage: {
   
   ageText: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: '500',
     color: '#333',
   },
   
   daysSubtext: {
     fontSize: 13,
-    fontWeight: '500',
-    color: '#555',
+    fontWeight: '800',
+    color: '#303030',
     marginTop: 2,
   },
   
@@ -129,8 +133,8 @@ avatarImage: {
     marginBottom: 4,
   },
   date: {
-    fontSize: 16,
-    color: '#555',
+    fontSize: 13,
+    color: '#303030',
     fontWeight: '500',
   },
   daysContainer: {

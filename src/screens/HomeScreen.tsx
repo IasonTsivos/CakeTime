@@ -31,6 +31,9 @@ import homescreenstyles from '../styles/homeScreenStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { requestNotificationPermission } from '../utils/requestNotification';
 import { useTheme } from '../utils/ThemeContext'; 
+import { Image as RNImage } from 'react-native'; 
+const cakeIcon = require('../assets/animations/cake.png');
+
 
 
 const { width } = Dimensions.get('window');
@@ -200,51 +203,60 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const flatListData = buildFlatListData();
 
   const renderBirthdayCard = (birthday: Birthday, isUpcoming: boolean) => {
-    const daysText = getDaysUntilBirthday(birthday.date);
-    const colors = getCardColors(daysText, isUpcoming);
+  const daysText = getDaysUntilBirthday(birthday.date);
+  const colors = getCardColors(daysText, isUpcoming);
 
-    return (
-      <TouchableOpacity
-        style={styles.birthdayCard}
-        activeOpacity={0.9}
-        onPress={() => navigation.navigate('EditBirthday', { birthday })}
+  return (
+    <TouchableOpacity
+      style={styles.birthdayCard}
+      activeOpacity={0.9}
+      onPress={() => navigation.navigate('EditBirthday', { birthday })}
+    >
+      <LinearGradient
+        colors={colors}
+        style={styles.gradientBackground}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <LinearGradient
-          colors={colors}
-          style={styles.gradientBackground}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <View style={styles.cardContent}>
-            <Image
-              source={{ uri: birthday.avatar }}
-              style={styles.avatarImage}
-              resizeMode="contain"
-            />
-            <View style={styles.details}>
-              <Text style={styles.name} numberOfLines={1}>
-                {birthday.name}
+        <View style={styles.cardContent}>
+          <Image
+            source={{ uri: birthday.avatar }}
+            style={styles.avatarImage}
+            resizeMode="contain"
+          />
+          <View style={styles.details}>
+            <Text style={styles.name} numberOfLines={1}>
+              {birthday.name}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <RNImage
+                source={cakeIcon}
+                style={{ width: 14, height: 14, marginRight: 6 }}
+                resizeMode="contain"
+              />
+              <Text style={styles.date}>
+                {format(parseISO(birthday.date), 'MMMM do')}
               </Text>
-              <Text style={styles.date}>{format(parseISO(birthday.date), 'MMMM do')}</Text>
-            </View>
-            <View style={styles.ageContainer}>
-              <Text style={styles.ageText}>{getNextAge(birthday.date)}</Text>
-              <Text style={styles.daysSubtext}>{daysText.replace('!', '')}</Text>
             </View>
           </View>
+          <View style={styles.ageContainer}>
+            <Text style={styles.ageText}>{getNextAge(birthday.date)}</Text>
+            <Text style={styles.daysSubtext}>{daysText.replace('!', '')}</Text>
+          </View>
+        </View>
 
-          {isUpcoming && (
-            <LottieView
-              source={require('../assets/animations/confettinew.json')}
-              autoPlay
-              loop
-              style={styles.confettiAnimation}
-            />
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-    );
-  };
+        {isUpcoming && (
+          <LottieView
+            source={require('../assets/animations/confettinew.json')}
+            autoPlay
+            loop
+            style={styles.confettiAnimation}
+          />
+        )}
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+};
 
   return (
     <View style={[styles.container, { paddingTop: insets.top - 30 }]}>
