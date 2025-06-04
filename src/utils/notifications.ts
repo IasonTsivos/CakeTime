@@ -27,14 +27,14 @@ export async function showTestNotification() {
 // Schedule both birthday and heads-up notifications
 export async function scheduleBirthdayNotifications(name: string, date: Date) {
   const now = new Date();
+  let birthdayThisYear = setHours(setMinutes(new Date(date), 0), 9);
+  birthdayThisYear.setFullYear(now.getFullYear());
 
-  // Ensure birthday is for this year or next
-  const thisYearBirthday = setHours(setMinutes(new Date(date), 0), 9);
-  thisYearBirthday.setFullYear(now.getFullYear());
+  const nextBirthday = isBefore(birthdayThisYear, now)
+    ? addYears(birthdayThisYear, 1)
+    : birthdayThisYear;
 
-  const nextBirthday = isBefore(thisYearBirthday, now)
-    ? addYears(thisYearBirthday, 1)
-    : thisYearBirthday;
+  const headsUpTime = setHours(setMinutes(subDays(nextBirthday, 1), 24), 15); // 6 PM
 
   const birthdayId = await Notifications.scheduleNotificationAsync({
     content: {
@@ -42,26 +42,16 @@ export async function scheduleBirthdayNotifications(name: string, date: Date) {
       body: `Today is ${name}'s birthday! 🎉`,
       sound: 'default',
     },
-    trigger: {
-      type: 'date',
-      date: nextBirthday,
-    },
+    trigger: nextBirthday,
   });
-
-  // Heads-up: 1 day before at 6 PM
-  const headsUpDate = subDays(nextBirthday, 1);
-  const headsUpTime = setHours(setMinutes(headsUpDate, 8), 12);
 
   const headsUpId = await Notifications.scheduleNotificationAsync({
     content: {
       title: `🎉 ${name}'s Birthday is Tomorrow`,
-      body: `Get ready! ${name}'s birthday is tomorrow. Prepare a gift! 🎁`,
+      body: `Get ready! ${name}'s birthday is tomorrow. 🎁`,
       sound: 'default',
     },
-    trigger: {
-      type: 'date',
-      date: headsUpTime,
-    },
+    trigger: headsUpTime,
   });
 
   return {
@@ -69,6 +59,7 @@ export async function scheduleBirthdayNotifications(name: string, date: Date) {
     headsUp: headsUpId,
   };
 }
+
 
 
 // Cancel notifications by ID

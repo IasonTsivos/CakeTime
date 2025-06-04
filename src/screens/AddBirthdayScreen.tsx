@@ -67,6 +67,7 @@ export default function AddBirthdayScreen() {
       if (!notificationIds.birthday || !notificationIds.headsUp) {
         console.error('Failed to save birthday:', Error);
         Alert.alert('Error', 'Failed to schedule notifications properly.');
+        console.log('Generated UUID:', uuid.v4());
         return;
       }
 
