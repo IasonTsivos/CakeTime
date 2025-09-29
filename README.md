@@ -1,71 +1,62 @@
-# 🎂 CakeTime: Never Forget a Birthday! 🎁  
+# CakeTime: Never Forget a Birthday 🎂  
 
-CakeTime is the ultimate mobile app for remembering, tracking, and planning celebrations for your favorite people. Say goodbye to last-minute gift scrambles and hello to effortless birthday planning!  
-
----
-
-## ✨ Features That Make Us Sweet  
-
-### 🗓️ Never Miss a Date (Dashboard & Reminders)  
-We make sure you're always ready to party!  
-- **🔥 The Countdown is ON:** The main screen features a beautiful, dynamic countdown for every friend, showing exactly how many days are left.  
-- **🎁 VIP Priority:** The nearest birthday is highlighted with a vibrant "Get your 🎁 for" card, so you know who's next in line.  
-- **🔔 Notification Ninjas:** Set timely custom local notifications to get alerted before the big day. You can even **Send Test Notification** in the settings to confirm everything works perfectly!  
-
-### 📝 Friend Management (Easy Peasy)  
-Adding and updating contacts should be a piece of cake!  
-- **👤 Detailed Profiles:** Effortlessly add a friend's Name, select their Birthday using a date picker, and choose a fun Custom Avatar to make them stand out.  
-- **💬 Draft-a-Wish:** Store a personalized Birthday Wish draft right in the app. No more staring blankly at your phone at midnight!  
-- **✏️ Quick Edits & Deletion:** The "Edit Birthday" screen gives you one-tap access to Save Changes or Delete an entry entirely.  
-
-### 💡 Gift Guru Mode (Plan Ahead)  
-The best part of the app for future you!  
-- **🧠 Brain Dump:** The "Gift Ideas" field lets you quickly capture inspiration throughout the year. Never forget a great idea again!  
-- **🏷️ Tag Team:** Ideas are instantly converted into stylish, removable tags (like `book` or `mobile phone`) for a clutter-free shopping list.  
-
-### 🎨 Personal Touch (Make It Yours)  
-Customize your experience to match your style.  
-- **🌈 Color Pop:** Head to Customization in Settings to select your favorite theme color! Choose from **Pink, Green, or Cyan** to instantly change the primary UI elements.  
+CakeTime is a mobile app that helps you remember, track, and plan birthdays for your favorite people.  
+No more last-minute scrambles for gifts or forgetting to send a wish — CakeTime keeps you ready to celebrate.  
 
 ---
 
-## 📱 Screenshots
+## 📱 App Preview  
 
 | Dashboard | Add Birthday | Edit Details | Settings |
 |-----------|--------------|--------------|----------|
-| <img src="./screenshots/homescreen.png" width="300"/> | <img src="./screenshots/addbirthday.png" width="300"/> | <img src="./screenshots/editbirthday.png" width="300"/> | <img src="./screenshots/selecttheme.png" width="300"/> |
-
-
----
-
-## 🛠️ The Tech Stack (Under the Hood)  
-
-**Frontend:**  
- React Native 
-
-
-**Notifications:**  
-Native Notifications  
-  
-
-**Database:**  
-e.g., Firestore 
+| <img src="./screenshots/homescreen.png" width="250"/> | <img src="./screenshots/addbirthday.png" width="250"/> | <img src="./screenshots/editbirthday.png" width="250"/> | <img src="./screenshots/selecttheme.png" width="250"/> |
 
 ---
 
-## 🚀 Getting Started (Run It Locally)  
+## ✨ Key Features  
 
+### Stay on Top of Birthdays  
+- **Countdown Dashboard:** See how many days are left for each friend.  
+- **Next Up Highlight:** The nearest birthday is always front and center.  
+- **Smart Notifications:** Set reminders in advance — even test them in settings.  
 
-### Installation  
+### Manage Friends Easily  
+- Add profiles with **name, date picker, and custom avatar**.  
+- Save **personalized birthday wishes** directly in the app.  
+- Edit or delete entries with just one tap.  
+
+### Plan Better Gifts  
+- Capture ideas in a **Gift Ideas field** throughout the year.  
+- Items are converted into **tags** for a clean, organized shopping list.  
+
+### Make It Yours  
+- Personalize the app with a **theme color** (Pink, Green, or Cyan).  
+
+---
+
+## 🛠️ Tech Stack  
+
+- **Frontend:** React Native  
+- **Notifications:** Native Local Notifications  
+- **Database:** Firestore  
+
+---
+
+## 🚀 Getting Started  
+
+Clone and run the app locally:  
+
 ```bash
-# 👯 Clone the repository
-git clone https://github.com/your-username/caketime.git
+# Clone the repository
+git clone https://github.com/IasonTsivos/CakeTime.git
 
-# ➡️ Navigate to the project directory
-cd caketime
+# Navigate to the project folder
+cd CakeTime
 
-# 📦 Install dependencies (Example for a React Native project)
+# Install dependencies
 npm install
 
-# 📱 Run the application on your device/simulator
-npx react-native run-android # or run-ios
+# Run on Android or iOS
+npx react-native run-android
+# or
+npx react-native run-ios
